@@ -1,5 +1,4 @@
 # lINKEDLIST  Implementation for hAppy Habit Triangles
-require 'pry'
 
 Node = Struct.new(:today, :yest)
 
@@ -29,12 +28,13 @@ module NodeOperations
 end
 
 class Habit
-  attr_accessor :name, :description, :date_of_initiation, :head_node
+  attr_accessor :id, :name, :description, :date_of_initiation, :head_node
   include NodeOperations
   include Enumerable
   require 'date'
 
-  def initialize(name, first_day_completed = false, description = 'A habit', existing_habit_history = nil)
+  def initialize(id, name, first_day_completed = false, description = 'A habit', existing_habit_history = nil)
+    @id = id
     @name = name
     @description = description
     @date_of_initiation = Time.now
