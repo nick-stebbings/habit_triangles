@@ -1,0 +1,24 @@
+<div id="intro_pane">
+    <h1><%= @page_title %></h1>
+    <div><%= in_paragraphs(@intro_spiel) %></div>
+</div>
+<div>
+    <table>
+        <caption>
+            <h2><%= @habit.description %></h2>
+        </caption>
+        <tr>
+            <form action="/habits/<%= @habit.id %>/update" method="post">
+            <label for="habit_description">Description</label>
+                <input type="text" name="habit_description" id="habit_description" value="<%= @habit.description %>">
+            <label for="date_of_initiation">Date Started</label>
+                <input type="date" name="date_of_initiation" id="date_of_initiation" value="<%= @habit.date_of_initiation.strftime('%Y-%m-%d') %>">
+            <label for="aspect_tag">Aspect Tag</label>
+                <input type="text" name="aspect_tag" id="aspect_tag" value="#">
+            <label for="completed_today">Completed Today?</label>
+                <input type="checkbox" name="completed_today" id="completed_today" value="<%= !!@habit.head_node.today %>">
+                <button type="submit">Update Habit</button>
+            </form>
+        </tr>
+    </table>
+</div>

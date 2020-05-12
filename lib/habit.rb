@@ -28,15 +28,16 @@ module NodeOperations
 end
 
 class Habit
-  attr_accessor :id, :name, :description, :date_of_initiation, :head_node
+  attr_accessor :id, :name, :aspect, :description, :date_of_initiation, :head_node
   include NodeOperations
   include Enumerable
   require 'date'
 
-  def initialize(id, name, first_day_completed = false, description = 'A habit', existing_habit_history = nil)
+  def initialize(id, name, aspect: '#', description: 'A habit', first_day_completed: false, existing_habit_history: nil)
     @id = id
     @name = name
     @description = description
+    @aspect = aspect
     @date_of_initiation = Time.now
     @head_node = push(first_day_completed, existing_habit_history)
   end
@@ -67,22 +68,3 @@ class Habit
 
     
 end
-a = Habit.new('eat cheese', true, 'Eat your way to victory')
-b = Habit.new('eat  moar cheese', true, 'Eat your way to victory', a.head_node)  # => #<Habit:0x00007fffece0c9e8 @name="eat  moar cheese", @description="Eat your way to victory", @date_of_initiation=2020-05-10 15:35:32.094792 +1200, @head_node=#<struct Node today=true, yest=#<struct Node today=true, yest=nil>>>
-  # => #<Habit:0x00007fffece0c9e8
-  #     @date_of_initiation=2020-05-10 15:35:32.094792 +1200,
-  #     @description="Eat your way to victory",
-  #     @head_node=
-  #      #<struct Node today=true, yest=#<struct Node today=true, yest=nil>>,
-  #     @name="eat  moar cheese">
-  b.length  # => 2
-  c = b.insert_nth(1, false) # => #<struct Node today=true, yest=#<struct Node today=false, yest=#<struct Node today=true, yest=nil>>>
-  b.get_nth(1)  # => #<struct Node today=false, yest=#<struct Node today=true, yest=nil>>
-  b.each_link_completed { |bool| puts bool }  # => #<struct Node today=true, yest=#<struct Node today=false, yest=#<struct Node today=true, yest=nil>>>
-
-# >> true
-# >> false
-# >> true
-# >> true
-# >> false
-# >> true

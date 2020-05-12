@@ -1,0 +1,23 @@
+<div id="intro_pane">
+
+</div>
+<div>
+    <table>
+        <caption>
+            <h2><%= @habit.description %></h2>
+        </caption>
+        <tr>
+            <td>Date of Habit Commencement</td>
+            <td><%= @habit.date_of_initiation %></td>
+        </tr>
+        <tr>
+            <td>Habit Aspect</td>
+            <td><%= @habit.aspect %></td>
+        </tr>
+        <tr>
+            <td>Completed Today?</td>
+            <td><%= !!@habit.head_node.today %></td>
+        </tr>
+    </table>
+    </form>
+</div>

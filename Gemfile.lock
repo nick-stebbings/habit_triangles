@@ -1,19 +1,28 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    ansi (1.5.0)
     ast (2.4.0)
     backport (1.1.2)
     backports (3.17.1)
     benchmark (0.1.0)
+    builder (3.2.4)
     childprocess (3.0.0)
     coderay (1.1.2)
     e2mmap (0.1.0)
     erubis (2.7.0)
     ffi (1.11.3)
+    fileutils (1.4.1)
     jaro_winkler (1.5.4)
     maruku (0.7.3)
     method_source (1.0.0)
     mini_portile2 (2.4.0)
+    minitest (5.14.0)
+    minitest-reporters (1.4.2)
+      ansi
+      builder
+      minitest (>= 5.0)
+      ruby-progressbar
     multi_json (1.14.1)
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
@@ -31,6 +40,8 @@ GEM
     rack (2.2.2)
     rack-protection (2.0.8.1)
       rack
+    rack-test (1.1.0)
+      rack (>= 1.0, < 3)
     rainbow (3.0.0)
     reverse_markdown (1.4.0)
       nokogiri
@@ -86,12 +97,19 @@ PLATFORMS
 
 DEPENDENCIES
   erubis
+  fileutils
+  minitest
+  minitest-reporters
   pry
   pry-remote
+  rack-test
   seeing_is_believing
   sinatra
   sinatra-contrib
   solargraph
+
+RUBY VERSION
+   ruby 2.7.1p83
 
 BUNDLED WITH
    2.1.4
