@@ -17,7 +17,7 @@ module NodeOperations
     head_node
   end
   
-  def each_link_completed
+  def each_node_completed?
     current_node = head_node
     while current_node
       yield(current_node.today)
@@ -36,8 +36,8 @@ class Habit
   def initialize(id, name, aspect: '#', description: 'A habit', first_day_completed: false, existing_habit_history: nil)
     @id = id
     @name = name
-    @description = description
     @aspect = aspect
+    @description = description
     @date_of_initiation = Time.now
     @head_node = push(first_day_completed, existing_habit_history)
   end

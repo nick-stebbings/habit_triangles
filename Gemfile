@@ -1,12 +1,11 @@
 source 'https://rubygems.org'
 
-ruby '2.7.1'
+ruby '2.4.10'
 
 gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'erubis'
-gem 'fileutils'
-gem 'minitest'
+gem 'minitest'  
 gem 'minitest-reporters'
 gem 'rack-test'
 

@@ -1,11 +1,11 @@
 <div id="intro_pane">
     <h1><%= @page_title %></h1>
-    <div><%= in_paragraphs(@intro_spiel) %></div>
+    <div><%== in_paragraphs(@intro_spiel) %></div>
 </div>
 <div>
     <table>
         <caption>
-            <h2><%= @habit.description %></h2>
+            <h2><%== @habit.description %></h2>
         </caption>
         <tr>
             <form action="/habits/<%= @habit.id %>/update" method="post">

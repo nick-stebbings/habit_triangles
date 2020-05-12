@@ -12,7 +12,6 @@ GEM
     e2mmap (0.1.0)
     erubis (2.7.0)
     ffi (1.11.3)
-    fileutils (1.4.1)
     jaro_winkler (1.5.4)
     maruku (0.7.3)
     method_source (1.0.0)
@@ -97,7 +96,6 @@ PLATFORMS
 
 DEPENDENCIES
   erubis
-  fileutils
   minitest
   minitest-reporters
   pry
@@ -109,7 +107,7 @@ DEPENDENCIES
   solargraph
 
 RUBY VERSION
-   ruby 2.7.1p83
+   ruby 2.4.10p364
 
 BUNDLED WITH
    2.1.4
