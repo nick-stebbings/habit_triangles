@@ -32,10 +32,19 @@ class Habit
   include NodeOperations
   include Enumerable
   require 'date'
+=begin   TODO - rearrange instantiations around the following 'options hash' format for readability.
+  def initialize(id, name, aspect: '#', description: 'A habit', options)
+    options = {
+      existing_habit_history: nil,
+      is_atmomic: false,
+      first_day_completed: false
+    }.merge(options) 
+=end
 
-  def initialize(id, name, aspect: '#', description: 'A habit', first_day_completed: false, existing_habit_history: nil)
+  def initialize(id, name, aspect: '#', description: 'A habit', first_day_completed: false, existing_habit_history: nil, is_atomic: false)
     @id = id
     @name = name
+    @is_atomic = is_atomic
     @aspect = aspect
     @description = description
     @date_of_initiation = Time.now

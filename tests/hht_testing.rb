@@ -22,15 +22,16 @@ class HHTTest < Minitest::Test
   end
 
   def session_with_a_goal
-    {"rack.session" => {goals: {'a_goal' => Goal.new(0, 'a_goal', Habit.new(0, 'a_habit'))}}}
+    {"rack.session" => {goals: {'a_goal' => Goal.new(0, [Habit.new(0, 'a_habit')], 'a_goal')}, habits: [Habit.new(0, 'a_habit')]}}
   end
 
   def setup
   end
 
-  def test_index_loads
+  def test_index_loads_introduction_for_new_session
     get "/"
-    assert_equal last_response.status, 200
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, 'Introduction'
   end
   
   def test_it_initially_redirects_to_first_goal_if_one_exists
@@ -74,44 +75,88 @@ class HHTTest < Minitest::Test
     habits_array = session[:goals]['a_new_goal'].habits
 
     post "/habits/#{habits_array.first.id}/update", {
-      habit_description: 'A new habit that has far too many words and some 3%#%#$',
-      aspect_tag: '#some-tag'
+      habit_description: 'A new habit that has far too many words and some 3%#%#$ that you really should not put in there',
+      aspect_tag: '#some-tag',
+      date_of_initiation: DateTime.now
     }
     assert_equal 422, last_response.status
+  end
+  
+  def test_it_allows_valid_updating_of_habit_description
+    post "/", {goal_name: 'A new goal'}
+    habits_array = session[:goals]['a_new_goal'].habits
+    
+    post "/habits/#{habits_array.first.id}/update", {
+      habit_description: 'A new habit description that is diff',
+      aspect_tag: '#some-tag',
+      date_of_initiation: DateTime.now
+    }
+    
+    assert_equal 302, last_response.status
+    # Add a line to check the name in the goal page?
   end
   
   def test_it_disallows_invalid_updating_of_habit_aspect
     post "/", {goal_name: 'A new goal'}
     habits_array = session[:goals]['a_new_goal'].habits
-
+    
     post "/habits/#{habits_array.first.id}/update", {
       habit_description: 'A new habit',
       aspect_tag: 'Some wrong tag'
     }
+    
+    assert_equal 422, last_response.status
+  end
+  
+  def test_it_allows_valid_updating_of_habit_aspect
+    post "/", {goal_name: 'A new goal'}
+    habits_array = session[:goals]['a_new_goal'].habits
+    
+    post "/habits/#{habits_array.first.id}/update", {
+      habit_description: 'A new habit',
+      aspect_tag: '#some-actual-tag',
+      date_of_initiation: DateTime.now
+    }
+
+    assert_equal 302, last_response.status
+  end
+  
+  def test_it_disallows_invalid_updating_of_date_of_initiation
+    post "/", {goal_name: 'A new goal'}
+    habits_array = session[:goals]['a_new_goal'].habits
+
+    post "/habits/#{habits_array.first.id}/update", {
+      habit_description: 'A new habit',
+      aspect_tag: '#some-tag',
+      date_of_initiation: (DateTime.now + 10000)
+    }
 
     assert_equal 422, last_response.status
   end
-
-  def test_it_allows_valid_updating_of_habit_description
+  
+  def test_it_allows_viewing_a_habit
+    get "/habits/0", {}, session_with_a_goal
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, 'habit'
+  end
+  
+  def test_it_deletes_a_habit
+    post "/habits/0/delete", {}, session_with_a_goal
+    assert_equal 302, last_response.status
+    get "/habits/0"
+    assert_equal 302, last_response.status # 'Not found' route
+  end
+  
+  def test_it_allows_toggling_of_day_completed
     skip
     assert_equal last_response.status, 200
   end
 
-  def test_it_allows_valid_updating_of_aspect_names
+  def test_it_updates_a_habit
     skip
     assert_equal last_response.status, 200
   end
-
-  def test_it_disallows_invalid_updating_of_aspect_names
-    skip
-    assert_equal last_response.status, 200
-  end
-
-  def test_it_disallows_invalid_updating_of_date_of_initiation
-    skip
-    assert_equal last_response.status, 200
-  end
-
+  
   def test_it_allows_toggling_of_day_completed
     skip
     assert_equal last_response.status, 200

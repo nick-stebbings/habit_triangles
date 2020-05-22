@@ -9,19 +9,23 @@ require_relative 'lib/habit'
 require_relative 'lib/goal'
 
 set :port, 9889
-ROOT = File.expand_path('..', __FILE__)
+OOT = File.expand_path('..', __FILE__)
 TEXT = YAML.load_file(ROOT + '/public/paragraphs_text.yaml')
 
 MESSAGES = {
-  invalid_habit_name: "You entered an invalid habit name. Please try to summarise in up to 5 words, split with spaces.",
   invalid_goal_name: "You entered an invalid goal name. Please try to summarise in up to 5 words, split with spaces.",
+  invalid_habit_name: "You entered an invalid habit name. Please try to summarise in up to 5 words, split with spaces.",
   invalid_habit_description: "You entered an invalid habit description. Please limit it to 50 characters or less.",
+  invalid_date_of_initiation: "You entered an invalid date, it is in the future!",
   invalid_aspect_tag: "You entered an invalid tag. The format should be #this-is-a-tag"
 }
+def set_session_variables
+  session[:goals] ||= {}
+  session[:habits] = session[:goals].each_with_object([]) { |(goal_name, goal), habits_list| habits_list << goal.habits }.uniq.flatten
+end
 
 before do
-  session[:goals] ||= {}
-  session[:habits] ||= []
+  set_session_variables
 end
 
 configure do
@@ -31,7 +35,7 @@ configure do
 end
 
 def get_habit(id)
-  session[:habits].first { |habit| habit.id == id }
+  session[:habits].find { |habit| habit.id == id }
 end
 
 def get_goal(id)
@@ -48,26 +52,49 @@ def get_next_id(of)  # Return next id in overall goals hash/habits ary
     max + 1
 end
 
+def valid_goal_name?(phrase)
+  phrase.match? %r{^(?:\w* ){0,4}\w+$} # Matches 'up to five words split by a space' format
+end
+
+def valid_habit_description?(phrase)
+  phrase.length < 50
+end
+
+def valid_date?(initiation)
+  initiation.is_a?(DateTime) ? (initiation.jd <= DateTime.now.jd) : nil
+end
+
+def valid_aspect?(tag)
+  tag.match? %r{^#(?:\w*-){0,8}\w+$} # Matches #this-is-a-tag format with at most 8 dashes
+end
+
+def get_goal_key_by_habit(id)
+  
+  session[:goals].each { |goal_name, goal| return goal_name if goal.habits.find { |habit| habit.id == id } }
+  nil
+end
+
+def calculate_streak(habit)
+  count = 0
+  habit.each_node_completed? do |node_data|
+    break unless node_data
+    count +=1
+  end
+  count
+end
+
 helpers do
   def in_paragraphs(text)
     text.split("\n").map { |para| "<p>#{para}</p>" }.join
   end
 
-  def valid_goal_name(phrase)
-    phrase.match? %r{^(?:\w* ){0,4}\w+$} # Matches 'up to five words split by a space' format
-  end
-
-  def valid_habit_description(phrase)
-    phrase.length < 50
-  end
-  
-  def valid_aspect(tag)
-    tag.match? %r{^#(?:\w*-){0,8}\w+$} # Matches #this-is-a-tag format with at most 8 dashes
-  end
-    
   def snake_case(phrase)
     phrase.downcase.split(' ').join('_')
   end
+end
+
+not_found do
+  redirect "/"
 end
 
 get "/" do
@@ -82,7 +109,7 @@ get "/" do
 end
 
 post "/" do
-  if valid_goal_name(params[:goal_name].strip)
+  if valid_goal_name?(params[:goal_name].strip)
     # Once a valid goal name has been entered, convert it to a label to use as a hash key in session[:goals]
     goal_name = snake_case(params[:goal_name].strip)
     # Instantiate a new goal with 3 new habits, redirect to flesh out the first habit
@@ -105,6 +132,7 @@ end
 
 get "/habits/:id" do |id|
   @habit = get_habit(id.to_i)
+  halt 404 unless @habit
   erb :existing_habit
 end
 
@@ -126,14 +154,17 @@ end
 
 post "/habits/:id/update" do |id|
   @habit = get_habit(id.to_i)
-
-  session[:message] = MESSAGES[:invalid_habit_description] unless valid_habit_description(params[:habit_description])
-  session[:message] = MESSAGES[:invalid_aspect_tag] unless valid_aspect(params[:aspect_tag])
+  
+  session[:message] = MESSAGES[:invalid_habit_description] unless valid_habit_description?(params[:habit_description])
+  session[:message] = MESSAGES[:invalid_aspect_tag] unless valid_aspect?(params[:aspect_tag])
+  date = DateTime.parse(params[:date_of_initiation]).new_offset if params[:date_of_initiation]
+  # binding.pry
+  session[:message] = MESSAGES[:invalid_date_of_initiation] unless valid_date?(date)
   if session[:message]
     halt 422, erb(:error)
   else
     @habit.description = params[:habit_description].strip
-    @habit.date_of_initiation = Date.parse(params[:date_of_initiation])
+    @habit.date_of_initiation = date
     @habit.aspect = params[:aspect_tag]
     @habit.head_node.today = !!(params[:completed_today] == 'false')
   end
@@ -141,7 +172,13 @@ post "/habits/:id/update" do |id|
   redirect "/habits/#{id}"
 end
 
-
+post "/habits/:id/delete" do |id|
+  goal = session[:goals][get_goal_key_by_habit(id.to_i)]
+  binding.pry
+  goal.habits.delete_if { |habit| habit.id == id.to_i}
+  session[:habits].delete_if { |habit| habit.id == id.to_i }
+  redirect "/goals/#{goal.id}"
+end
 
 
 
