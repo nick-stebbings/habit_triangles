@@ -21,8 +21,8 @@ class HHTTest < Minitest::Test
     last_request.env["rack.session"]
   end
 
-  def session_with_a_goal
-    {"rack.session" => {goals: {'a_goal' => Goal.new(0, [Habit.new(0, 'a_habit')], 'a_goal')}, habits: [Habit.new(0, 'a_habit')]}}
+  def session_with_a_objective
+    {"rack.session" => {objectives: {'a_objective' => Objective.new(0, [Habit.new(0, 'a_habit')], 'a_objective')}, habits: [Habit.new(0, 'a_habit')]}}
   end
 
   def setup
@@ -34,23 +34,23 @@ class HHTTest < Minitest::Test
     assert_includes last_response.body, 'Introduction'
   end
   
-  def test_it_initially_redirects_to_first_goal_if_one_exists
-    get "/", {}, session_with_a_goal
+  def test_it_initially_redirects_to_first_objective_if_one_exists
+    get "/", {}, session_with_a_objective
     assert_equal 302, last_response.status
     
     get last_response["Location"]
     assert_equal 200, last_response.status
-    assert_includes last_response.body, 'goal'
+    assert_includes last_response.body, 'objective'
   end
 
-  def test_it_creates_a_goal
-    post "/", {goal_name: 'A new goal'}
-    assert_includes session[:goals].keys, 'a_new_goal'  
+  def test_it_creates_a_objective
+    post "/", {objective_name: 'A new objective'}
+    assert_includes session[:objectives].keys, 'a_new_objective'  
   end
   
-  def test_it_creates_3_habits_per_goal
-    post "/", {goal_name: 'A new goal'}
-    habits_array = session[:goals]['a_new_goal'].habits
+  def test_it_creates_3_habits_per_objective
+    post "/", {objective_name: 'A new objective'}
+    habits_array = session[:objectives]['a_new_objective'].habits
     
     assert_equal 3, habits_array.size
     habits_array.each do |item|
@@ -58,21 +58,21 @@ class HHTTest < Minitest::Test
     end
   end
   
-  def test_it_transforms_valid_goal_names_to_snake_case_for_key
-    post "/", {goal_name: 'A new goal'}
-    goal_name = session[:goals].key? 'a_new_goal'
+  def test_it_transforms_valid_objective_names_to_snake_case_for_key
+    post "/", {objective_name: 'A new objective'}
+    objective_name = session[:objectives].key? 'a_new_objective'
 
-    assert goal_name
+    assert objective_name
   end
   
-  def test_it_disallows_invalid_goal_names
-    post "/", {goal_name: 'A new goal that has far too many words and some 3%#%#$'}
+  def test_it_disallows_invalid_objective_names
+    post "/", {objective_name: 'A new objective that has far too many words and some 3%#%#$'}
     assert_equal 422, last_response.status
   end
   
   def test_it_disallows_invalid_updating_of_habit_description
-    post "/", {goal_name: 'A new goal'}
-    habits_array = session[:goals]['a_new_goal'].habits
+    post "/", {objective_name: 'A new objective'}
+    habits_array = session[:objectives]['a_new_objective'].habits
 
     post "/habits/#{habits_array.first.id}/update", {
       habit_description: 'A new habit that has far too many words and some 3%#%#$ that you really should not put in there',
@@ -83,8 +83,8 @@ class HHTTest < Minitest::Test
   end
   
   def test_it_allows_valid_updating_of_habit_description
-    post "/", {goal_name: 'A new goal'}
-    habits_array = session[:goals]['a_new_goal'].habits
+    post "/", {objective_name: 'A new objective'}
+    habits_array = session[:objectives]['a_new_objective'].habits
     
     post "/habits/#{habits_array.first.id}/update", {
       habit_description: 'A new habit description that is diff',
@@ -93,12 +93,12 @@ class HHTTest < Minitest::Test
     }
     
     assert_equal 302, last_response.status
-    # Add a line to check the name in the goal page?
+    # Add a line to check the name in the objective page?
   end
   
   def test_it_disallows_invalid_updating_of_habit_aspect
-    post "/", {goal_name: 'A new goal'}
-    habits_array = session[:goals]['a_new_goal'].habits
+    post "/", {objective_name: 'A new objective'}
+    habits_array = session[:objectives]['a_new_objective'].habits
     
     post "/habits/#{habits_array.first.id}/update", {
       habit_description: 'A new habit',
@@ -109,8 +109,8 @@ class HHTTest < Minitest::Test
   end
   
   def test_it_allows_valid_updating_of_habit_aspect
-    post "/", {goal_name: 'A new goal'}
-    habits_array = session[:goals]['a_new_goal'].habits
+    post "/", {objective_name: 'A new objective'}
+    habits_array = session[:objectives]['a_new_objective'].habits
     
     post "/habits/#{habits_array.first.id}/update", {
       habit_description: 'A new habit',
@@ -122,8 +122,8 @@ class HHTTest < Minitest::Test
   end
   
   def test_it_disallows_invalid_updating_of_date_of_initiation
-    post "/", {goal_name: 'A new goal'}
-    habits_array = session[:goals]['a_new_goal'].habits
+    post "/", {objective_name: 'A new objective'}
+    habits_array = session[:objectives]['a_new_objective'].habits
 
     post "/habits/#{habits_array.first.id}/update", {
       habit_description: 'A new habit',
@@ -135,13 +135,13 @@ class HHTTest < Minitest::Test
   end
   
   def test_it_allows_viewing_a_habit
-    get "/habits/0", {}, session_with_a_goal
+    get "/habits/0", {}, session_with_a_objective
     assert_equal 200, last_response.status
     assert_includes last_response.body, 'habit'
   end
   
   def test_it_deletes_a_habit
-    post "/habits/0/delete", {}, session_with_a_goal
+    post "/habits/0/delete", {}, session_with_a_objective
     assert_equal 302, last_response.status
     get "/habits/0"
     assert_equal 302, last_response.status # 'Not found' route

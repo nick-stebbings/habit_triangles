@@ -1,8 +1,8 @@
-# goal.rb
+# objective.rb
 
-class Goal
+class Objective
   attr_accessor :id, :habits, :name
-  def initialize(id, habits, name = 'A goal')
+  def initialize(id, habits, name = 'An objective')
     @id = id
     @habits = habits
     @name = name

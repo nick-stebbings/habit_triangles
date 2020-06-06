@@ -1,6 +1,11 @@
 p {
-    font-family: 'Manrope', sans-serif;
+		font-family: 'Manrope', sans-serif;
+		
 }
+text-justify {
+  text-align: justify;
+}
+
 a.arrow_link {
     color: #fff;
 }

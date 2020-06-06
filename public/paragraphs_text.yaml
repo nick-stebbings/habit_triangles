@@ -1,17 +1,19 @@
 --- #Homepage copy
 :intro_page:
   :first: >
-    This is Davey.
+    Welcome, dear user, to Happy Habit Triangles. This application fuses a few useful productivity and lifestyle hacks that I have encountered and found to be useful.
 
-    Davey is unhappy. Lately, whatever he seems to do, he can't get out of his own way. On some days he will be very motivated to achieve his goals and get a buzz from making progress towards them. On other days he feels lost and dejected, and does little to further his aims.
+    After beginning my studies at [Launch School](https://launchschool.com) I was introduced to a different way of learning.
+    To encourage a focus on mastery in my education, I was pointed toward the book ['Mastery : the keys to long-term success and fulfillment'](https://archive.org/details/masterykeystolon00leon) by George Leonard.
+    The key takeaway is the emphasis on process, rather than results. Proper process is the way to build skill. It takes as long as it takes.
 
-    Sometimes, when he is procrastinating, Davey finds inspirational videos online, which spur him into momentary action.
+    In my personal life I have been drawn towards habit tracking apps, as a way of creating stability in my day-to-day shcedule.
+    I find they can be useful, but a linear approach to monitoring personal behaviour, in my life, often breaks down. When I break a habit streak I feel like everything is broken!
 
-    This helps in the short term, but he finds that before long his motivation fades and he is once more frustrated and not able to consistently move forward with the things he wants to build.
+    In order to drill down into the details of why I do and don't do certain things, I am making this application. In essence, it is a FRACTAL habit tracker.
 
-    Davey wants to build consistent habits. He needs them to have a strong foundation, just like the pyramids.
-    He needs a <em>hAppy Habit Triangle</em>.
+    To begin, enter an objective that you would like to pursue, or simply a habit that you would like to form.
 
   :second: This is the second
 :new_habit:
-  :referred: You've made a goal, now let's break that up into different habits. We'll start with one. Let's try and think of a key habit that is really important for making the goal a reality.
+  :referred: You've made a objective, now let's break that up into different habits. We'll start with one. Let's try and think of a key habit that is really important for making the objective a reality.

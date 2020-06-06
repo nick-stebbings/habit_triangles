@@ -1,0 +1,29 @@
+    <h1><%= @page_title %></h1>
+<div id="intro_pane">
+    <div><%== in_paragraphs(@intro_spiel) %></div>
+</div>
+<div>
+
+            <form action="/habits/<%= @habit.id %>/update" method="post">
+            <div class="form-group row">
+            <label class="col-sm-2 col-form-label offset-4" for="habit_description">Description</label>
+                <input class="form-control-sm" type="text" name="habit_description" id="habit_description" value="<%= @habit.description %>">
+            </div>
+            <div class="form-group row">
+            <label class="col-sm-2 col-form-label offset-4" for="date_of_initiation">Date Started</label>
+                <input class="form-control-sm" type="date" name="date_of_initiation" id="date_of_initiation" value="<%= @habit.date_of_initiation.strftime('%Y-%m-%d') %>">
+            </div>
+            <div class="form-group row">
+            <label class="col-sm-2 col-form-label offset-4" for="aspect_tag">Aspect Tag</label>
+                <input class="form-control-sm" type="text" name="aspect_tag" id="aspect_tag" value="#">
+            </div>
+            <div class="form-group row">
+            <label class="col-sm-2 col-form-label offset-4" for="completed_today">Completed Today?</label>
+                <input class="form-check" type="checkbox" name="completed_today" id="completed_today" value="<%= !!@habit.head_node.today %>">
+            </div>
+            <div class="form-group row">
+                <button class="btn btn-primary sm-2 offset-6" type="submit">Update Habit</button>
+            </div>
+            </form>
+
+</div>

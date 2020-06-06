@@ -8,6 +8,7 @@ gem 'erubis'
 gem 'minitest'  
 gem 'minitest-reporters'
 gem 'rack-test'
+gem 'redcarpet'
 
 gem 'solargraph'
 gem 'seeing_is_believing'

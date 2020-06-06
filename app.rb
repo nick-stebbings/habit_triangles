@@ -2,30 +2,37 @@ require 'bundler/setup'
 require 'sinatra'
 require 'sinatra/reloader'
 require 'tilt/erubis'
-
+require 'redcarpet'
 require 'pry-remote'
 require 'yaml'
 require_relative 'lib/habit'
-require_relative 'lib/goal'
+require_relative 'lib/objective'
 
 set :port, 9889
-OOT = File.expand_path('..', __FILE__)
+ROOT = File.expand_path('..', __FILE__)
 TEXT = YAML.load_file(ROOT + '/public/paragraphs_text.yaml')
 
 MESSAGES = {
-  invalid_goal_name: "You entered an invalid goal name. Please try to summarise in up to 5 words, split with spaces.",
+  invalid_objective_name: "You entered an invalid objective name. Please try to summarise in up to 5 words, split with spaces.",
   invalid_habit_name: "You entered an invalid habit name. Please try to summarise in up to 5 words, split with spaces.",
   invalid_habit_description: "You entered an invalid habit description. Please limit it to 50 characters or less.",
   invalid_date_of_initiation: "You entered an invalid date, it is in the future!",
   invalid_aspect_tag: "You entered an invalid tag. The format should be #this-is-a-tag"
 }
 def set_session_variables
-  session[:goals] ||= {}
-  session[:habits] = session[:goals].each_with_object([]) { |(goal_name, goal), habits_list| habits_list << goal.habits }.uniq.flatten
+  session[:objectives] ||= {}
+  session[:habits] = session[:objectives].each_with_object([]) { |(objective_name, objective), habits_list| habits_list << objective.habits }.uniq.flatten
 end
 
 before do
   set_session_variables
+end
+
+helpers do
+  def render_markdown(text)
+    renderer = Redcarpet::Markdown.new(Redcarpet::Render::HTML)
+    renderer.render(text)
+  end
 end
 
 configure do
@@ -38,21 +45,21 @@ def get_habit(id)
   session[:habits].find { |habit| habit.id == id }
 end
 
-def get_goal(id)
-  session[:goals].values.first { |goal| goal.id == id }
+def get_objective(id)
+  session[:objectives].values.first { |objective| objective.id == id }
 end
 
-def get_next_id(of)  # Return next id in overall goals hash/habits ary
+def get_next_id(of)  # Return next id in overall objectives hash/habits ary
     case of
-    when :goal
-      max = session[:goals].values.map { |goal| goal.id }.max || 0
+    when :objective
+      max = session[:objectives].values.map { |objective| objective.id }.max || 0
     when :habit
       max = session[:habits].map { |habit| habit.id }.max || 0
     end
     max + 1
 end
 
-def valid_goal_name?(phrase)
+def valid_objective_name?(phrase)
   phrase.match? %r{^(?:\w* ){0,4}\w+$} # Matches 'up to five words split by a space' format
 end
 
@@ -68,9 +75,9 @@ def valid_aspect?(tag)
   tag.match? %r{^#(?:\w*-){0,8}\w+$} # Matches #this-is-a-tag format with at most 8 dashes
 end
 
-def get_goal_key_by_habit(id)
+def get_objective_key_by_habit(id)
   
-  session[:goals].each { |goal_name, goal| return goal_name if goal.habits.find { |habit| habit.id == id } }
+  session[:objectives].each { |objective_name, objective| return objective_name if objective.habits.find { |habit| habit.id == id } }
   nil
 end
 
@@ -98,36 +105,45 @@ not_found do
 end
 
 get "/" do
-  if session[:goals].empty?
+  if session[:objectives].empty?
     @page_title = 'Introduction'
-    @intro_spiel = TEXT[:intro_page][:first]
-    erb :intro
+    @intro_spiel = render_markdown(TEXT[:intro_page][:first])
+    erb :index
   else
-    current_goal = session[:goals].values.min_by { |goal| goal.id } #this criteria will change
-    redirect "/goals/#{current_goal.id}"
+    current_objective = session[:objectives].values.min_by { |objective| objective.id } #this criteria will change
+    redirect "/objectives/#{current_objective.id}"
   end
 end
 
 post "/" do
-  if valid_goal_name?(params[:goal_name].strip)
-    # Once a valid goal name has been entered, convert it to a label to use as a hash key in session[:goals]
-    goal_name = snake_case(params[:goal_name].strip)
-    # Instantiate a new goal with 3 new habits, redirect to flesh out the first habit
-    goal_id = get_next_id(:goal) 
-    #/ Change the habit's IDs to be goal specific ?"#{goal_id}_#{i}"
-    session[:goals][goal_name] = Goal.new(goal_id, Array.new(3){ |i| Habit.new(i, goal_name + "_cornerstone_#{i}") }, goal_name.strip )
+  if valid_objective_name?(params[:objective_name].strip)
+    # Once a valid objective name has been entered, convert it to a label to use as a hash key in session[:objectives]
+    objective_name = snake_case(params[:objective_name].strip)
+    # Instantiate a new objective with 3 new habits, redirect to flesh out the first habit
+    objective_id = get_next_id(:objective) 
+    #/ Change the habit's IDs to be objective specific ?"#{objective_id}_#{i}"
+    session[:objectives][objective_name] = Objective.new(objective_id, Array.new(3){ |i| Habit.new(i, objective_name + "_cornerstone_#{i}") }, objective_name.strip )
 
-    session[:goals][goal_name].habits.each do |habit|
+    session[:objectives][objective_name].habits.each do |habit|
       session[:habits] << habit
     end
     
-    first_habit = session[:goals][goal_name].habits.first
+    first_habit = session[:objectives][objective_name].habits.first
     redirect "/habits/#{first_habit.id}/update?initial=true"
   else
-    session[:message] = MESSAGES[:invalid_goal_name]
+    session[:message] = MESSAGES[:invalid_objective_name]
     halt 422, erb(:error) if session[:message]
-    redirect "/#enter_goal" #how to fragment redirect?
+    redirect "/#enter_objective" #how to fragment redirect?
   end
+end
+
+get "/habits/new" do
+  # Create a habit using inputs:
+    # start today? 
+     # IF YES then process input then redirect to habits/view 
+     # ELSE process input then redirect to habits/update_days 
+  # 
+  erb :new_habit
 end
 
 get "/habits/:id" do |id|
@@ -136,9 +152,13 @@ get "/habits/:id" do |id|
   erb :existing_habit
 end
 
-get "/goals/:id" do |id|
-  @goal = get_goal(id.to_i)
-  session[:goals].keys
+get "/objectives/:id" do |id|
+  @objective = get_objective(id.to_i)
+  session[:objectives].keys
+end
+
+get "/habits/:id/update_days" do |id|
+  # Habit
 end
 
 get "/habits/:id/update" do |id|
@@ -149,7 +169,7 @@ get "/habits/:id/update" do |id|
   else
     @intro_spiel = 'This is just an old habit.'
   end
-  erb :new_habit
+  erb :update_habit
 end
 
 post "/habits/:id/update" do |id|
@@ -173,11 +193,11 @@ post "/habits/:id/update" do |id|
 end
 
 post "/habits/:id/delete" do |id|
-  goal = session[:goals][get_goal_key_by_habit(id.to_i)]
+  objective = session[:objectives][get_objective_key_by_habit(id.to_i)]
   binding.pry
-  goal.habits.delete_if { |habit| habit.id == id.to_i}
+  objective.habits.delete_if { |habit| habit.id == id.to_i}
   session[:habits].delete_if { |habit| habit.id == id.to_i }
-  redirect "/goals/#{goal.id}"
+  redirect "/objectives/#{objective.id}"
 end
 
 
