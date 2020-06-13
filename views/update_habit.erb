@@ -1,29 +1,80 @@
-    <h1><%= @page_title %></h1>
-<div id="intro_pane">
-    <div><%== in_paragraphs(@intro_spiel) %></div>
-</div>
-<div>
+    <div class="row justify-content-center align-items-center">
+        <div class="col">
+            <h1 class="text-center">Habit Details</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="jumbotron m-auto">
+                <span class='text-justify'><%== in_paragraphs(@intro_spiel) %></span>
+            </div>
+        </div>
+    </div>
 
-            <form action="/habits/<%= @habit.id %>/update" method="post">
-            <div class="form-group row">
-            <label class="col-sm-2 col-form-label offset-4" for="habit_description">Description</label>
-                <input class="form-control-sm" type="text" name="habit_description" id="habit_description" value="<%= @habit.description %>">
-            </div>
-            <div class="form-group row">
-            <label class="col-sm-2 col-form-label offset-4" for="date_of_initiation">Date Started</label>
-                <input class="form-control-sm" type="date" name="date_of_initiation" id="date_of_initiation" value="<%= @habit.date_of_initiation.strftime('%Y-%m-%d') %>">
-            </div>
-            <div class="form-group row">
-            <label class="col-sm-2 col-form-label offset-4" for="aspect_tag">Aspect Tag</label>
-                <input class="form-control-sm" type="text" name="aspect_tag" id="aspect_tag" value="#">
-            </div>
-            <div class="form-group row">
-            <label class="col-sm-2 col-form-label offset-4" for="completed_today">Completed Today?</label>
-                <input class="form-check" type="checkbox" name="completed_today" id="completed_today" value="<%= !!@habit.head_node.today %>">
-            </div>
-            <div class="form-group row">
-                <button class="btn btn-primary sm-2 offset-6" type="submit">Update Habit</button>
-            </div>
-            </form>
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                </div>
+                <div class="card-body">
+                <form action="<%= "/habits/#{@habit.id}/update" %>" method="post">
+                    <div class="form-group">
+                        <div class="input-group-prepend"><span class="input-group-text">Description</span></div>
+                        <input type="text" class="form-control login-field" name="habit_description" value="" placeholder="<%= @habit.description %>" id="habit-description">
+                        <label class="login-field-icon" for="habit-description"></label>
+                    </div>
 
-</div>
+                    <div class="form-group">
+                        <div class="input-group-prepend"><span class="input-group-text">Aspect</span></div>
+                        <input type="text" class="form-control login-field" name="aspect_tag" value=""
+                            placeholder="<%= @habit.aspect %>" id="habit-aspect">
+                        <label class="login-field-icon" for="habit-aspect"></label>
+                    </div>
+
+                    <div class="form-group">
+                    <div class="input-group-prepend"><span class="input-group-text">Initiation Date</span></div>
+                        <input type="date" class="form-control login-field" name="date_of_initiation"
+                            value="<%= @habit.date_of_initiation.strftime('%Y-%m-%d') %>"
+                            placeholder="<%= @habit.date_of_initiation %>" id="habit-start-date">
+                        <label class="login-field-icon" for="habit-start-date"></label>
+                    </div>
+
+                    <div class="row">
+                        <div class="col sm-6">
+                            <button class="btn btn-inverse btn-lg btn-block" type="submit">Update Habit Details</a>
+                        </div>
+                </form>
+                        <div class="col sm-6">
+                            <form class="delete" action="<%= "/habits/#{@habit.id}/delete" %>" method="post">
+                                <button class="btn btn-danger btn-lg btn-block " type="submit">Delete this habit</button>
+                            </form>
+                        </div>
+                    </div>
+                    <card class="sm-6 offset-3">
+                    <div class="row" style="border: 1px solid gray;">
+                        <card-header class="sm-3 offset-2">
+                            Today's completion status:
+                        </card-header>
+                        <card-header class="sm-3 offset-3">
+                            Running streak for this habit:
+                        </card-header>
+                    </div>
+                    <div class="row" style="border: 1px solid gray;">
+                        <card-body class="sm-3 offset-3">
+                            <div style="width: 50px; height: 50px;" class="text-justify <%= !!@habit.head_node.today ? 'fui-check' : 'fui-cross' %>">
+                            </div>
+                        </card-body>
+                        <card-body class="sm-3 offset-5 justify-content-sm-center">
+                            <span class="streak-count"><%= calculate_streak(@habit) %></span>
+                        </card-body>
+                    </div>
+                    <a href="<%= "/habits/#{@habit.id}" %>"><button
+                            class="btn btn-primary btn-lg btn-block">Track Habit</button></a>
+                    </card>
+                    
+                </div>
+            </div>    
+            </div>
+            </div>
+        </div>
+    </div>

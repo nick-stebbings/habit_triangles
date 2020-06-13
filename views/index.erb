@@ -1,96 +1,103 @@
-<div class="row justify-content-center align-items-center">
-  <div class="col">
-    <h2 class="text-center">Welcome</h2>
-  </div>
-</div>
 <div class="row">
   <div class="col">
-    <div class="jumbotron m-auto">
+    <div class="jumbotron m-auto" id="front-page">
       <h1 class='text-center'><%= @page_title %></h1>
       <span class='text-justify'><%== in_paragraphs(@intro_spiel) %></span>
-      <p><a class="btn btn-primary d-flex justify-content-sm-center" href="#">Learn more about habit philosophy</a></p>
     </div>
   </div>
 </div>
 <div class="row">
   <div class="col">
-    <div id="accordion-1">
-      <div class="card">
-        <div class="card-header">
-          <h5 class="mb-0"><a data-toggle="collapse" href="div#accordion-1 .item-1">Set a new objective</a></h5>
+    <div id="choices" role="tablist">
+      <div role="tab" class="card" id="create_new_objective_card_header">
+        <div class=" card-header">
+          <h3 class="mb-0"><a data-toggle="collapse" href="#new-objective">Set a new objective</a></h3>
         </div>
-        <div data-parent="#accordion-1" class="collapse show item-1">
+        <div role="tabpanel" class="collapse show" id="new-objective">
           <div class="card-body">
-            <p class="card-text">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio, dapibus ac
-              facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus.</p>
+            <p class="card-text">Input and objective that you would like to strive for. Then we can flesh it out by
+              adding 3 key habits for fulfilling this objective. Please use five words or less, separated by spaces.</p>
             <div class="col">
               <div class="row">
                 <div class="col-lg-9 offset-lg-1">
-                  <form>
+                  <form name="new-objective-form" action="/" method="post">
                     <div class="input-group">
                       <div class="input-group-prepend"><span class="input-group-text">Set An Objective</span></div>
-                      <input type="text" class="form-control" />
+                      <input type="text" class="form-control" name="objective_name" />
                       <div class="input-group-append">
-                        <div class="dropdown btn-group"><button class="btn btn-info dropdown-toggle" data-toggle="dropdown"
-                            type="button">Objective's Life Aspect</button>
+                        <div class="dropdown btn-group">
+                          <button class="btn btn-info dropdown-toggle" data-toggle="dropdown"
+                            name="objective-aspect">Aspect</button>
                           <div class="dropdown-menu">
-                              <a href="#" class="dropdown-item">#presentness</a>
-                              <a href="#" class="dropdown-item">#musicality</a>
-                              <a href="#" class="dropdown-item">#humour</a>
+                            <a class="dropdown-item">#presentness</a>
+                            <a class="dropdown-item">#musicality</a>
+                            <a class="dropdown-item">#humour</a>
                             <div class="dropdown-divider"></div>
                           </div>
                         </div>
                       </div>
+                      <button class="btn btn-success" type="submit" id="create_new_objective_btn">Go!</button>
                     </div>
-                  </form>
                 </div>
-                <div class="col"><button class="btn btn-success" type="button">Go!</button></div>
+                </form>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="card">
+      <div role="tab" class="card" id="create_new_habit_card_header">
         <div class="card-header">
-          <h5 class="mb-0"><a data-toggle="collapse" href="div#accordion-1 .item-2">Start a new habit</a></h5>
+          <h3 class="mb-0"><a data-toggle="collapse" href="#new-habit">Start a new habit</a></h3>
         </div>
-        <div data-parent="#accordion-1" class="collapse item-2">
+        <div role="tabpanel" class="collapse" id="new-habit">
           <div class="card-body">
             <p class="card-text">Focus on one simple habit by creating it here:</p>
             <div class="col">
               <div class="row">
                 <div class="col-lg-9 offset-lg-1">
-                  <form>
+                  <form name="new-habit-form" action="/" method="post">
                     <div class="input-group">
                       <div class="input-group-prepend"><span class="input-group-text">Start A Habit</span></div><input
-                        type="text" class="form-control" />
+                        type="text" class="form-control" name="habit_description" />
                       <div class="input-group-append">
-                        <div class="dropdown btn-group"><button class="btn btn-info dropdown-toggle"
-                            data-toggle="dropdown" type="button">Habit Aspect</button>
-                          <div class="dropdown-menu"><a href="#" class="dropdown-item">#presentness</a><a href="#"
-                              class="dropdown-item">#musicality</a><a href="#" class="dropdown-item">#humour</a>
+                        <div class="dropdown btn-group">
+                          <button class="btn btn-info dropdown-toggle" data-toggle="dropdown" type="button"
+                            name="habit-aspect">Aspect</button>
+                          <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">#presentness</a>
+                            <a href="#" class="dropdown-item">#musicality</a>
+                            <a href="#" class="dropdown-item">#humour</a>
                             <div class="dropdown-divider"></div>
                           </div>
                         </div>
+                        <button class="btn btn-success" type="submit" id="create_new_objective_btn">Go!</button>
                       </div>
                     </div>
                   </form>
                 </div>
-                <div class="col"><button class="btn btn-success" type="button">Go!</button></div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="card">
+      <div class="card" id="learn_more_card_header">
         <div class="card-header">
-          <h5 class="mb-0"><a data-toggle="collapse" href="div#accordion-1 .item-3">Learn about habit forming</a></h5>
+          <h3 class="mb-0"><a data-toggle="collapse" href="#learn-more">Learn about habit forming</a></h3>
         </div>
-        <div data-parent="#accordion-1" class="collapse item-3">
+        <div data-parent="#choices" class="accordion-collapse collapse" id="learn-more">
           <div class="card-body">
-            <p class="card-text">Here are some links about habit forming, and about the deeper psychology that informs this project:</p>
-            <a href="https://www.simplypsychology.org/maslow.html" target="_blank">Masolow's Heirarchy of Needs</a>
-            <a href="https://www.samuelthomasdavies.com/book-summaries/self-help/atomic-habits/" target="_blank">The Theory Behind Atmomic Habit Forming</a>
+          <ul>
+            <p class="card-text">Here are some links about habit forming, and about the deeper psychology that informs
+              this project:
+            </p>
+            <li>
+              <a href="https://www.simplypsychology.org/maslow.html" target="_blank">Masolow's Heirarchy of Needs</a>
+            </li>
+            <li>
+              <a href="https://www.samuelthomasdavies.com/book-summaries/self-help/atomic-habits/" target="_blank">The
+              Theory Behind Atmomic Habit Forming</a></li>
+              <a class="btn btn-primary d-flex justify-content-sm-center" href="#">Learn more about habit philosophy</a>
+          </ul>
           </div>
         </div>
       </div>

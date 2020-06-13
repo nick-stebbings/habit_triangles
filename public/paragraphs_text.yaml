@@ -7,13 +7,31 @@
     To encourage a focus on mastery in my education, I was pointed toward the book ['Mastery : the keys to long-term success and fulfillment'](https://archive.org/details/masterykeystolon00leon) by George Leonard.
     The key takeaway is the emphasis on process, rather than results. Proper process is the way to build skill. It takes as long as it takes.
 
-    In my personal life I have been drawn towards habit tracking apps, as a way of creating stability in my day-to-day shcedule.
+    In my personal life I have been drawn towards habit tracking apps, as a way of creating stability in my day-to-day schedule.
     I find they can be useful, but a linear approach to monitoring personal behaviour, in my life, often breaks down. When I break a habit streak I feel like everything is broken!
 
-    In order to drill down into the details of why I do and don't do certain things, I am making this application. In essence, it is a FRACTAL habit tracker.
+    In order to drill down into the details of why I do and don't do certain things, I am making this application.
+    
+    ## In essence, this is a FRACTAL habit tracker.
 
     To begin, enter an objective that you would like to pursue, or simply a habit that you would like to form.
 
   :second: This is the second
-:new_habit:
-  :referred: You've made a objective, now let's break that up into different habits. We'll start with one. Let's try and think of a key habit that is really important for making the objective a reality.
+  
+:existing_objective:
+  :new: Here is your chance to make a fresh start in one of your patterns of behaviour. If you would like to 
+
+:existing_habit:
+  :new: >
+    You've created a new habit to track, so you're well on the way to establishing some new behaviour.
+    Now let's break it down into smaller pieces. 
+
+    We've given the habit a description, and a tag for the aspect of your life that it covers.
+    Now we want to find out if this is an _atomic_ habit, that we could reduce to a list of actions.
+
+    Check the box once you've decided if it is atomic, then click 'start tracking'.
+
+    To decide, ask yourself this:
+    - Is it a general behaviour, like 'eat healthy food'?
+    - Or is it a specific set of actions?
+

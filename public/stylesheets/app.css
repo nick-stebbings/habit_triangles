@@ -1,25 +1,27 @@
 p {
 		font-family: 'Manrope', sans-serif;
-		
 }
 text-justify {
   text-align: justify;
 }
 
-a.arrow_link {
-    color: #fff;
+.jumbotron#front-page h1, .jumbotron#front-page p, .jumbotron#front-page h2{
+  color: white;
+}	
+.jumbotron#front-page {
+	background-color: #001F02;
 }
 
-html,
 body {
-  height: 100%;
-  margin: 0;
-}
-section {
-  height: 100vh;
+	background-image: url("../images/background.jpg");
+	background-repeat: repeat;
 }
 
-.down-arrow {
+h1, h2 {
+	color: white;
+}
+
+/* .down-arrow {
 	display: inline-block;
 	position: relative;
 	background: darkcyan;
@@ -39,4 +41,4 @@ section {
 	border-right: 100px solid transparent;
 	border-bottom: 0 solid transparent;
 	border-left: 100px solid transparent;
-}
+} */

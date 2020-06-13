@@ -3,12 +3,14 @@ require 'sinatra'
 require 'sinatra/reloader'
 require 'tilt/erubis'
 require 'redcarpet'
-require 'pry-remote'
 require 'yaml'
+require 'uri'
+
 require_relative 'lib/habit'
 require_relative 'lib/objective'
 
-set :port, 9889
+require 'pry-remote'
+
 ROOT = File.expand_path('..', __FILE__)
 TEXT = YAML.load_file(ROOT + '/public/paragraphs_text.yaml')
 
@@ -21,11 +23,7 @@ MESSAGES = {
 }
 def set_session_variables
   session[:objectives] ||= {}
-  session[:habits] = session[:objectives].each_with_object([]) { |(objective_name, objective), habits_list| habits_list << objective.habits }.uniq.flatten
-end
-
-before do
-  set_session_variables
+  session[:habits] ||= session[:objectives].each_with_object([]) { |(objective_name, objective), habits_list| habits_list << objective.habits }.uniq.flatten
 end
 
 helpers do
@@ -39,6 +37,7 @@ configure do
   enable :sessions
   set :session_secret, 'habit'
   set :erb, :escape_html => true
+  also_reload "paragraphs_text.yaml"
 end
 
 def get_habit(id)
@@ -76,7 +75,6 @@ def valid_aspect?(tag)
 end
 
 def get_objective_key_by_habit(id)
-  
   session[:objectives].each { |objective_name, objective| return objective_name if objective.habits.find { |habit| habit.id == id } }
   nil
 end
@@ -100,6 +98,10 @@ helpers do
   end
 end
 
+before do
+  set_session_variables
+end
+
 not_found do
   redirect "/"
 end
@@ -115,34 +117,41 @@ get "/" do
   end
 end
 
-post "/" do
-  if valid_objective_name?(params[:objective_name].strip)
+post "/" do # Process front page choice
+  first_habit = nil
+
+  if !!params[:objective_name] && valid_objective_name?(params[:objective_name].strip)
     # Once a valid objective name has been entered, convert it to a label to use as a hash key in session[:objectives]
     objective_name = snake_case(params[:objective_name].strip)
-    # Instantiate a new objective with 3 new habits, redirect to flesh out the first habit
+    # Instantiate a new objective with 3 new habits, redirect to a page to flesh out the first habit
     objective_id = get_next_id(:objective) 
-    #/ Change the habit's IDs to be objective specific ?"#{objective_id}_#{i}"
-    session[:objectives][objective_name] = Objective.new(objective_id, Array.new(3){ |i| Habit.new(i, objective_name + "_cornerstone_#{i}") }, objective_name.strip )
 
+    session[:objectives][objective_name] = Objective.new(objective_id, Array.new(3){ |i| Habit.new(get_next_id(:habit), objective_name + "_cornerstone_#{i}") }, objective_name.strip )
     session[:objectives][objective_name].habits.each do |habit|
       session[:habits] << habit
-    end
+    end # Added 3 new habits to the objective object
     
     first_habit = session[:objectives][objective_name].habits.first
-    redirect "/habits/#{first_habit.id}/update?initial=true"
+  elsif !!params[:habit_description] && valid_habit_description?(params[:habit_description].strip)
+    habit_name = snake_case(params[:habit_description])
+    first_habit = Habit.new(get_next_id(:habit), habit_name)
+    session[:habits] << first_habit
   else
-    session[:message] = MESSAGES[:invalid_objective_name]
+    session[:message] = MESSAGES[:invalid_objective_name] # // get this to choose a relevant message
     halt 422, erb(:error) if session[:message]
     redirect "/#enter_objective" #how to fragment redirect?
   end
+  redirect "/habits/#{first_habit.id}/update?initial=true"
+end
+
+get "/objectives/:id" do |id|
+  @objective = get_objective(id.to_i)
+  session[:objectives].keys
 end
 
 get "/habits/new" do
-  # Create a habit using inputs:
-    # start today? 
-     # IF YES then process input then redirect to habits/view 
-     # ELSE process input then redirect to habits/update_days 
-  # 
+  @atomic = false
+  @page_title = 'Create a new Habit'
   erb :new_habit
 end
 
@@ -152,20 +161,11 @@ get "/habits/:id" do |id|
   erb :existing_habit
 end
 
-get "/objectives/:id" do |id|
-  @objective = get_objective(id.to_i)
-  session[:objectives].keys
-end
-
-get "/habits/:id/update_days" do |id|
-  # Habit
-end
-
 get "/habits/:id/update" do |id|
   @habit = get_habit(id.to_i)
   @first_habit = !!params[:initial]
   if @first_habit
-    @intro_spiel = TEXT[:new_habit][:referred]
+    @intro_spiel = TEXT[:existing_habit][:new]
   else
     @intro_spiel = 'This is just an old habit.'
   end
@@ -174,11 +174,10 @@ end
 
 post "/habits/:id/update" do |id|
   @habit = get_habit(id.to_i)
-  
+
   session[:message] = MESSAGES[:invalid_habit_description] unless valid_habit_description?(params[:habit_description])
   session[:message] = MESSAGES[:invalid_aspect_tag] unless valid_aspect?(params[:aspect_tag])
   date = DateTime.parse(params[:date_of_initiation]).new_offset if params[:date_of_initiation]
-  # binding.pry
   session[:message] = MESSAGES[:invalid_date_of_initiation] unless valid_date?(date)
   if session[:message]
     halt 422, erb(:error)
@@ -194,7 +193,6 @@ end
 
 post "/habits/:id/delete" do |id|
   objective = session[:objectives][get_objective_key_by_habit(id.to_i)]
-  binding.pry
   objective.habits.delete_if { |habit| habit.id == id.to_i}
   session[:habits].delete_if { |habit| habit.id == id.to_i }
   redirect "/objectives/#{objective.id}"
