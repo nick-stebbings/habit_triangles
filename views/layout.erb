@@ -16,10 +16,12 @@
   <!-- Loading Bootstrap -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
     integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css"
+      rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/3.3.1/css/swiper.min.css">
+  
   <!-- Loading Flat UI Pro -->
   <link href="/css/flat-ui.css" rel="stylesheet">
-  
   <link rel="stylesheet" href="/stylesheets/app.css">
 
 </head>
@@ -39,15 +41,21 @@
 
     <script src="" async defer></script>
     <!-- Loading JS Assets -->
+    <script src="/javascripts/jquery-3.4.0.js" type='text/javascript'></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
       integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous">
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/3.3.1/js/swiper.jquery.min.js">
     </script>
-    <script src="/javascripts/jquery-3.4.0.js" type='text/javascript'></script>
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
     <script src="/javascripts/bootstrap.min.js" type='text/javascript'></script>
     <script src="/javascripts/flat-ui.js" type='text/javascript'></script>
     <script src="/javascripts/app.js" type='text/javascript'></script>
+    <script type='text/javascript'>
+    $('.toggle_completed_day').click(function () {
+    $(this).find('> [type="submit"]').click();
+    });
+    </script>
   </div>
 </body>
 

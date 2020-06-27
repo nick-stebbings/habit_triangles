@@ -1,80 +1,76 @@
-    <div class="row justify-content-center align-items-center">
-        <div class="col">
-            <h1 class="text-center">Habit Details</h2>
-        </div>
+
+<form action="<%= "/habits/#{@habit.id}/update" %>" method="post">
+    <div class="form-group">
+        <div class="input-group-prepend"><span class="input-group-text">Description</span></div>
+        <input type="text" class="form-control login-field" name="habit_description" value="" placeholder="<%= @habit.description %>" id="habit-description">
+        <label class="login-field-icon" for="habit-description"></label>
     </div>
-    <div class="row">
-        <div class="col">
-            <div class="jumbotron m-auto">
-                <span class='text-justify'><%== in_paragraphs(@intro_spiel) %></span>
+
+    <div class="form-group">
+        <div class="input-group-prepend"><span class="input-group-text">Aspect</span></div>
+        <input type="text" class="form-control login-field" name="aspect_tag" value=""
+            placeholder="<%= @habit.aspect %>" id="habit-aspect">
+        <label class="login-field-icon" for="habit-aspect"></label>
+    </div>
+
+    <div class="form-group">
+        <div class="input-group-prepend"><span class="input-group-text">Initiation Date</span></div>
+        <input type="date" class="form-control login-field" name="date_of_initiation"
+            value="<%= @habit.date_of_initiation.strftime('%Y-%m-%d') %>"
+            placeholder="<%= @habit.date_of_initiation %>" id="habit-start-date">
+        <label class="login-field-icon" for="habit-start-date"></label>
+    </div>
+
+    <div class="form-group">
+        <div class="input-group-prepend"><span class="input-group-text">Atomic?</span></div>
+        <div class="bootstrap-switch-square">
+            <div
+                class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-animate bootstrap-switch-id-custom-switch-03 bootstrap-switch-off">
+                <div class="bootstrap-switch-container"><span
+                        class="bootstrap-switch-handle-on bootstrap-switch-primary"><span
+                            class="fui-check"></span></span><label
+                        class="bootstrap-switch-label">&nbsp;</label><span
+                        class="bootstrap-switch-handle-off bootstrap-switch-default"><span
+                            class="fui-cross"></span></span><input type="checkbox" checked=""
+                        data-toggle="switch" id="custom-switch-03"
+                        data-on-text="<span class='fui-check'></span>"
+                        data-off-text="<span class='fui-cross'></span>"></div>
             </div>
         </div>
     </div>
 
     <div class="row">
-        <div class="col">
-            <div class="card">
-                <div class="card-header">
-                </div>
-                <div class="card-body">
-                <form action="<%= "/habits/#{@habit.id}/update" %>" method="post">
-                    <div class="form-group">
-                        <div class="input-group-prepend"><span class="input-group-text">Description</span></div>
-                        <input type="text" class="form-control login-field" name="habit_description" value="" placeholder="<%= @habit.description %>" id="habit-description">
-                        <label class="login-field-icon" for="habit-description"></label>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="input-group-prepend"><span class="input-group-text">Aspect</span></div>
-                        <input type="text" class="form-control login-field" name="aspect_tag" value=""
-                            placeholder="<%= @habit.aspect %>" id="habit-aspect">
-                        <label class="login-field-icon" for="habit-aspect"></label>
-                    </div>
-
-                    <div class="form-group">
-                    <div class="input-group-prepend"><span class="input-group-text">Initiation Date</span></div>
-                        <input type="date" class="form-control login-field" name="date_of_initiation"
-                            value="<%= @habit.date_of_initiation.strftime('%Y-%m-%d') %>"
-                            placeholder="<%= @habit.date_of_initiation %>" id="habit-start-date">
-                        <label class="login-field-icon" for="habit-start-date"></label>
-                    </div>
-
-                    <div class="row">
-                        <div class="col sm-6">
-                            <button class="btn btn-inverse btn-lg btn-block" type="submit">Update Habit Details</a>
-                        </div>
-                </form>
-                        <div class="col sm-6">
-                            <form class="delete" action="<%= "/habits/#{@habit.id}/delete" %>" method="post">
-                                <button class="btn btn-danger btn-lg btn-block " type="submit">Delete this habit</button>
-                            </form>
-                        </div>
-                    </div>
-                    <card class="sm-6 offset-3">
-                    <div class="row" style="border: 1px solid gray;">
-                        <card-header class="sm-3 offset-2">
-                            Today's completion status:
-                        </card-header>
-                        <card-header class="sm-3 offset-3">
-                            Running streak for this habit:
-                        </card-header>
-                    </div>
-                    <div class="row" style="border: 1px solid gray;">
-                        <card-body class="sm-3 offset-3">
-                            <div style="width: 50px; height: 50px;" class="text-justify <%= !!@habit.head_node.today ? 'fui-check' : 'fui-cross' %>">
-                            </div>
-                        </card-body>
-                        <card-body class="sm-3 offset-5 justify-content-sm-center">
-                            <span class="streak-count"><%= calculate_streak(@habit) %></span>
-                        </card-body>
-                    </div>
-                    <a href="<%= "/habits/#{@habit.id}" %>"><button
-                            class="btn btn-primary btn-lg btn-block">Track Habit</button></a>
-                    </card>
-                    
-                </div>
-            </div>    
-            </div>
-            </div>
+        <div class="col sm-6">
+            <button class="btn btn-inverse btn-lg btn-block" type="submit">Update Habit Details</button>
+            </form>
+        </div>
+        <div class="col sm-6">
+            <form class="delete" action="<%= "/habits/#{@habit.id}/delete" %>" method="post">
+                <button class="btn btn-danger btn-lg btn-block " type="submit">Delete this habit</button>
+            </form>
         </div>
     </div>
+    <div class="card col-sm-8 offset-2">
+
+        <div class="row">
+            <div class="card-header col sm-3">
+                <p class="text-center">Today's completion status</p>
+            </div>
+            <div class="card-header col sm-3">
+                <p class="text-center">Running streak for this habit</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="card-body sm-3 offset-3">
+                <div class="check-box text-justify <%= !!@habit.head_node.today ? 'fui-check' : 'fui-cross' %>">
+                </div>
+            </div>
+            <div class="card-body sm-3 offset-5 justify-content-sm-center">
+                <span class="streak-count"><%= calculate_streak(@habit) %></span>
+            </div>
+        </div>
+    
+        <a href="<%= "/habits/#{@habit.id}/fractal" %>" class="btn btn-primary btn-lg btn-block">Track Habit</a>
+    </div>
+</div>

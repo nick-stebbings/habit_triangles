@@ -1,0 +1,88 @@
+    <div class="row justify-content-center align-items-center">
+      <div class="col">
+        <h1 class="text-center">Habit Details</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="jumbotron m-auto">
+          <span class='text-justify'><%== in_paragraphs(@intro_spiel) %></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-header">
+          </div>
+          <div class="card-body">
+
+            <div class="simple-slider">
+              <div class="swiper-container">
+                <div class="swiper-wrapper">
+                  <% length_of_habit = @habit.length %>
+                  <% @habit.each_with_index do |node, idx| %>
+                  <div class="swiper-slide">
+                    <div class="row">
+                      <div class="col-lg-11">
+                        <div class="row">
+                          <div class="col">
+                            <div class="table-responsive">
+                              <table>
+                                <caption>
+                                  <h2><%= "Date" %></h2>
+                                </caption>
+                                <tr>
+                                  <td>Date: <%= p node.today %></td>
+                                  <td><%= (@reference_date + (length_of_habit - idx - 1)).strftime "%d/%m/%Y" %>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Completed Today?</td>
+                                  <td>
+
+                                    <form class="toggle_completed_day" action="<%= "/habits/#{@habit.id}/fractal" %>"
+                                      method="post">
+                                      <input name="completed2" id="completed-day2-<%= idx %>" type="checkbox"
+                                        <%= if (node.today == 't') then "checked" end %> />
+                                      <input name="completed" id="completed-day-<%= idx %>" type="checkbox"
+                                        data-toggle="switch" <%= if (node.today == 't') then "checked" end %> />
+                                      <input type="submit" value="submit" id="toggle" />
+                                    </form>
+                                  </td>
+
+
+
+
+                                  <td>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td></td>
+                                  <td></td>
+                                </tr>
+                                <tr>
+                                  <td></td>
+                                  <td></td>
+                                </tr>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <% end %>
+                </div>
+                <div class="swiper-pagination"></div>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+    </div>

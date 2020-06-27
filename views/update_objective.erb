@@ -1,212 +1,78 @@
-<div class="row justify-content-center align-items-center">
-    <div class="col">
-        <h2 class="text-center">Welcome</h2>
-    </div>
-</div>
-<div class="row">
-    <div class="col">
-        <div class="jumbotron m-auto">
-            <h1 class="text-center"><%= @page_title %></h1>
-            <span class="text-justify"><%== in_paragraphs(@intro_spiel) %></span>
+    <div class="row justify-content-center align-items-center">
+        <div class="col">
+            <h1 class="text-center">Objective Details</h2>
         </div>
     </div>
-</div>
-<div class="row">
-    <div class="col">
-        <h1><%= @page_title %></h1>
-        <div id="intro_pane">
-            <div><%== in_paragraphs(@intro_spiel) %></div>
+    <div class="row">
+        <div class="col">
+            <div class="jumbotron m-auto">
+                <p>These are the 3 cornerstone habits for the <b><%= @objective.name %></b> objective.</p>
+                <p>If you would like to alter the descriptions, go ahead.</p>
+                <p>If you want to get into the details for each habit (update them, define them as atomic, etc.) press the button next to the description.</p>
+            </div>
         </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="simple-slider">
+                    <div class="swiper-container">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide">
+                                <div class="row">
+                                    <div class="col-lg-11">
 
-        <div class="simple-slider">
-            <div class="swiper-container">
-                <div class="swiper-wrapper">
-                    <div class="swiper-slide">
-                        <div class="row">
-                            <div class="col-lg-11">
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="table-responsive">
-                                            <table class="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Day 0</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>T</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="table-responsive">
-                                            <table class="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Day 0</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>T</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="table-responsive">
-                                            <table class="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Day 0</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>T</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                        <form action="<%= "/objectives/#{@objective.id}/update" %>"
+                                                            method="post">
+                                            <% @habits.each_with_index do |habit, idx| %>
+
+                                            <div class="row">
+                                                <div class="col">
+                                                    <div class="table-responsive">
+                                                                        
+                                                        <table class="table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Habit <%== idx + 1 %></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                            <div class="input-group-prepend"><span
+                                                                                    class="input-group-text">Description</span>
+                                                                            </div>
+                                                                            <input type="text"
+                                                                                class="form-control login-field"
+                                                                                name="habit_description" value=""
+                                                                                placeholder="<%= habit.description %>"
+                                                                                id="habit-description" disabled="disabled">
+                                                                            <div class="input-group-append">
+                                                                            <a
+                                                                                href="/habits/<%= habit.id %>/update">
+                                                                                <button class="btn btn-success" id="habit_<%= idx + 1 %>_details">Details</button>
+                                                                            </a>
+                                                                            </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <% end %>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
+                     
                         </div>
-                    </div>
-                    <div class="swiper-slide">
-                        <div class="row">
-                            <div class="col-lg-1"></div>
-                            <div class="col-lg-11">
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="table-responsive">
-                                            <table class="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Day 0</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>T</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="table-responsive">
-                                            <table class="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Day 0</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>T</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="table-responsive">
-                                            <table class="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Day 0</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>T</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="swiper-slide">
-                        <div class="row">
-                            <div class="col-lg-1"></div>
-                            <div class="col-lg-11">
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="table-responsive">
-                                            <table class="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Day 0</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>T</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="table-responsive">
-                                            <table class="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Day 0</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>T</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="table-responsive">
-                                            <table class="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Day 0</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>T</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="swiper-pagination"></div>
+                        <div class="swiper-button-prev"></div>
+                        <div class="swiper-button-next"></div>
                     </div>
                 </div>
-                <div class="swiper-pagination"></div>
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-button-next"></div>
             </div>
         </div>
     </div>

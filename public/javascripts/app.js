@@ -1,8 +1,6 @@
 // app.js
 $(function () {
-  // $('#formDecideAtomic input:radio').change(function () {
-  //   location.reload()
-  // }
+  $('[data-toggle="switch"]').bootstrapSwitch();
 
   $("form.delete").submit(function (event) {
     event.preventDefault();

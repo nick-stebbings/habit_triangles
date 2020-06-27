@@ -1,0 +1,54 @@
+
+            <% @objective.habits.each_with_index do |habit, idx| %>
+
+            <div class="row">
+              <div class="col">
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Habit: <%== habit.name %></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          Description
+                        </td>
+                        <td>
+                          <%= habit.description %>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          Aspect
+                        </td>
+                        <td>
+                          <%= habit.aspect %>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          Update Details
+                        </td>
+                        <td>
+                          <a href="<%= "/habits/#{habit.id}/update" %>" class="btn btn-warning btn-lg btn-block">Habit Summary</a>
+                          <a href="<%= "/habits/#{habit.id}/fractal" %>" class="btn btn-primary btn-lg btn-block">Track
+                            Habit</a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <% end %>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</div>

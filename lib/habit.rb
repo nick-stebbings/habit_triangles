@@ -5,7 +5,7 @@ Node = Struct.new(:today, :yest)
 module NodeOperations
 
   def push(current_day, history = nil)
-    self.head_node = Node.new(current_day, (history || head_node))  # Push onto another habit history or the head node of the current LL
+    self.head_node = Node.new(current_day.to_s, (history || head_node))  # Push onto another habit history or the head node of the current LL
   end
   
   def each
@@ -24,6 +24,12 @@ module NodeOperations
       current_node = current_node.yest
     end
     head_node
+  end
+
+  # Fill in days between last day completed and today
+  def update_to_today! 
+    days_left = Date.today.jd - date_of_initiation.jd
+    (days_left - length).times { push('f') } unless length == days_left
   end
 end
 
@@ -47,13 +53,13 @@ class Habit
     @is_atomic = is_atomic
     @aspect = aspect
     @description = description
-    @date_of_initiation = Time.now
-    @head_node = push(first_day_completed, existing_habit_history)
+    @date_of_initiation = Date.today
+    @head_node = push((first_day_completed ? 't' : 'f'), existing_habit_history)
   end
 
   def length
     current_node = head_node
-    len = current_node.today ? 1 : 0
+    len = !!current_node.today ? 1 : 0
     while current_node.yest do
       len += 1
       current_node = current_node.yest

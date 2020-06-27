@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html lang="en" class="no-js">
+<!--<![endif]-->
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title><%= @page_title %></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Loading Bootstrap -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+  integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <!-- Loading Flat UI Pro -->
+  <link rel="stylesheet" href="/css/flat-ui.css">
+  <link rel="stylesheet" href="/stylesheets/app.css">
+</head>
+
+<body>
+  <div class="container">
+    <!--[if lt IE 7]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <div class="row justify-content-center align-items-center">
+      <div class="col">
+        <h1 class="text-center"><%= @page_title %></h1>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <div class="jumbotron m-auto">
+          <%== in_paragraphs(@intro_spiel) %>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-header">
+            <% if session[:message] %>
+            <div class="flash">
+              <%= session.delete(:message) %>
+            </div>
+            <% end %>
+          </div>
+          <div class="card-body">
+            <%== yield %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="" async defer></script>
+  <!-- Loading JS Assets -->
+  <script src="/javascripts/jquery-3.4.0.js"></script>
+  <script src="/javascripts/bootstrap.min.js"></script>
+  <script src="/javascripts/flat-ui.js"></script>
+  <script src="/javascripts/app.js"></script>
+</body>
+</html>
