@@ -1,18 +1,9 @@
 --- #Homepage copy
 :intro_page:
   :first: >
-    Welcome, dear user, to Happy Habit Triangles. This application fuses a few useful productivity and lifestyle hacks that I have encountered and found to be useful.
-
-    After beginning my studies at [Launch School](https://launchschool.com) I was introduced to a different way of learning.
-    To encourage a focus on mastery in my education, I was pointed toward the book ['Mastery : the keys to long-term success and fulfillment'](https://archive.org/details/masterykeystolon00leon) by George Leonard.
-    The key takeaway is the emphasis on process, rather than results. Proper process is the way to build skill. It takes as long as it takes.
-
-    In my personal life I have been drawn towards habit tracking apps, as a way of creating stability in my day-to-day schedule.
-    I find they can be useful, but a linear approach to monitoring personal behaviour, in my life, often breaks down. When I break a habit streak I feel like everything is broken!
-
-    In order to drill down into the details of why I do and don't do certain things, I am making this application.
+    Welcome to *Happy Habit Triangles*
     
-    ## In essence, this is a FRACTAL habit tracker.
+    In essence, this is a FRACTAL habit tracker.
 
     To begin, enter an objective that you would like to pursue, or simply a habit that you would like to form.
 
@@ -35,3 +26,13 @@
     - Is it a general behaviour, like 'eat healthy food'?
     - Or is it a specific set of actions?
 
+# :extra_info: >
+#     This application fuses a few useful productivity and lifestyle hacks that I have encountered and found to be useful.
+
+#     After beginning my studies at [Launch School](https://launchschool.com) I was introduced to a different way of learning. To encourage a focus on mastery in my education, I was pointed toward the book ['Mastery : the keys to long-term success and fulfillment'](https://archive.org/details/masterykeystolon00leon) by George Leonard.
+#     The key takeaway is the emphasis on process, rather than results. Proper process is the way to build skill. It takes as long as it takes.
+
+#     In my personal life I have been drawn towards habit tracking apps, as a way of creating stability in my day-to-day schedule.
+#     I find they can be useful, but a linear approach to monitoring personal behaviour, in my life, often breaks down. When I break a habit streak I feel like everything is broken!
+
+#     In order to drill down into the details of why I do and don't do certain things, I am making this application.
