@@ -4,17 +4,20 @@ Node = Struct.new(:today, :yest)
 
 module NodeOperations
 
-  def push(current_day, history = nil)
-    self.head_node = Node.new(current_day.to_s, (history || head_node))  # Push onto another habit history or the head node of the current LL
+  def push(current_day_completed)
+    self.head_node = Node.new(current_day_completed, head_node)
   end
-  
-  def each
-    current_node = head_node
-    while current_node
-      yield(current_node)
-      current_node = current_node.yest
-    end
-    head_node
+
+  def get_nth(n, node = @head_node)
+    node ? n.zero? ? node : get_nth(n - 1, node.yest) : (raise ArgumentError)
+  end
+
+  def insert_nth(n, data, head = @head_node)
+    @head_node = if n.zero?
+                  Node.new(data).tap{ |node| node.yest = head }
+                else
+                  head.tap{ |node| node.yest = insert_nth(n - 1, data, node.yest) }
+                end
   end
   
   def each_node_completed?
@@ -34,27 +37,26 @@ module NodeOperations
 end
 
 class Habit
-  attr_accessor :id, :name, :aspect, :description, :date_of_initiation, :head_node, :is_atomic
+  attr_reader :id, :name
+  attr_accessor :aspect, :description, :is_atomic
+  attr_accessor :date_of_initiation, :head_node
+
   include NodeOperations
   include Enumerable
   require 'date'
-=begin   TODO - rearrange instantiations around the following 'options hash' format for readability.
-  def initialize(id, name, aspect: '#', description: 'A habit', options)
-    options = {
-      existing_habit_history: nil,
-      is_atmomic: false,
-      first_day_completed: false
-    }.merge(options) 
-=end
 
-  def initialize(id, name, aspect: '', description: '', first_day_completed: false, existing_habit_history: nil, is_atomic: false)
+  def initialize(id, name, aspect: '', description: '', **options)
+    options = {
+      is_atmomic: false,
+    }.merge(options) 
+
     @id = id
     @name = name
-    @is_atomic = is_atomic
     @aspect = aspect
     @description = description
+    @is_atomic = is_atomic
     @date_of_initiation = Date.today
-    @head_node = push((first_day_completed ? 't' : 'f'), existing_habit_history)
+    @head_node = push('f')
   end
 
   def length
@@ -66,20 +68,13 @@ class Habit
     end
     len
   end
-
-  def get_nth(n, node = @head_node)
-    node ? n.zero? ? node : get_nth(n - 1, node.yest) : (raise ArgumentError)
+  
+  def each
+    current_node = head_node
+    while current_node
+      yield(current_node)
+      current_node = current_node.yest
+    end
+    head_node
   end
-
-  def insert_nth(n, data, head = @head_node)
-    @head_node = if n.zero?
-                  Node.new(data).tap{ |node| node.yest = head }
-                else
-                  head.tap{ |node| node.yest = insert_nth(n - 1, data, node.yest) }
-                end
-  end
-  private
-
-
-    
 end
