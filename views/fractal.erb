@@ -1,88 +1,75 @@
-    <div class="row justify-content-center align-items-center">
-      <div class="col">
-        <h1 class="text-center">Habit Details</h2>
-      </div>
+<div class="row">
+  <div class="col">
+    <div class="jumbotron m-auto">
+      <h1 class="text-center"><%= @page_title %></h1>
+      <%== in_paragraphs(@intro_spiel) %>
     </div>
-    <div class="row">
-      <div class="col">
-        <div class="jumbotron m-auto">
-          <span class='text-justify'><%== in_paragraphs(@intro_spiel) %></span>
+  </div>
+</div>
+
+<div class="row" id="fractal">
+  <div class="col">
+
+    <div class="card">
+      <div class="card-header">
+      
+        <!-- Display warnings and success messages -->
+        <% if session[:message] %>
+        <div class="flash">
+          <%= session.delete(:message) %>
         </div>
+        <% end %>
+        <%== @sub_info  %>
       </div>
-    </div>
 
-    <div class="row">
-      <div class="col">
-        <div class="card">
-          <div class="card-header">
-          </div>
-          <div class="card-body">
+      <% length_of_habit = @habits.first.length %>
 
-            <div class="simple-slider">
-              <div class="swiper-container">
-                <div class="swiper-wrapper">
-                  <% length_of_habit = @habit.length %>
-                  <% @habit.each_with_index do |node, idx| %>
-                  <div class="swiper-slide">
-                    <div class="row">
-                      <div class="col-lg-11">
-                        <div class="row">
-                          <div class="col">
-                            <div class="table-responsive">
-                              <table>
-                                <caption>
-                                  <h2><%= "Date" %></h2>
-                                </caption>
-                                <tr>
-                                  <td>Date: <%= p node.today %></td>
-                                  <td><%= (@reference_date + (length_of_habit - idx - 1)).strftime "%d/%m/%Y" %>
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td>Completed Today?</td>
-                                  <td>
+      <form class="toggle_completed_day" action="" method="post">
+        <!-- Hidden element will pass the index of the slide to the backend for persistence -->
+        <input type="hidden" name="node_completed_index" value="" id="node-completed-index" />
 
-                                    <form class="toggle_completed_day" action="<%= "/habits/#{@habit.id}/fractal" %>"
-                                      method="post">
-                                      <input name="completed2" id="completed-day2-<%= idx %>" type="checkbox"
-                                        <%= if (node.today == 't') then "checked" end %> />
-                                      <input name="completed" id="completed-day-<%= idx %>" type="checkbox"
-                                        data-toggle="switch" <%= if (node.today == 't') then "checked" end %> />
-                                      <input type="submit" value="submit" id="toggle" />
-                                    </form>
-                                  </td>
+        <div class="swiper-container">
+          <div class="swiper-wrapper">
+            <% # Add a swiper slide for each day that a habit was tracked. Days between last tracked day and current day are automatically filled in %>
+            <% @habits.first.each_with_index do |node, idx| %>
+            <div class="swiper-slide" data-name="<%== "#{idx}-day-#{node.today}" %>">
+              <!-- Day specific information -->
+              <dl class="h-flex">
+                <dt class="input-group-prepend"><span class="input-group-text">Days Tracked:</span></dt>
+                <dd class="habit-tracked-length"><%= @habits.first.length %></dd>
+                <dt class="input-group-prepend"><span class="input-group-text">Date:</span></dt>
+                <dd class="habit-tracked-day">
+                  <%= (@reference_date + (length_of_habit - idx - 1)).strftime "%d/%m/%Y" %></dd>
+              </dl>
+S
+              <!-- Habit specific information -->
+              <dl class="v-flex habit-list">
+                <dt class="input-group-text">
+                  <div><%== render_markdown(@habits.first.name.split('_').join("\n\r")) %></div>
+                </dt>
+                <dd class="habit-tracked-toggle h-flex">
 
-
-
-
-                                  <td>
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td></td>
-                                  <td></td>
-                                </tr>
-                                <tr>
-                                  <td></td>
-                                  <td></td>
-                                </tr>
-                              </table>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                    <!-- Toggle button -->
+                    <button class="btn btn-inverse">Tasks</button>
+                    <div class="bootstrap-switch-square">
+                      <input name="completed-day-<%= idx %>" id="completed-day-<%= idx %>" type="checkbox"
+                        data-toggle="switch" data-on-text="<i class='fui-check'></i>"
+                        data-off-text="<i class='fui-cross'></i>" <%= if (node.today == 't') then "checked" end %> />
                     </div>
-                  </div>
-                  <% end %>
-                </div>
-                <div class="swiper-pagination"></div>
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-button-next"></div>
-              </div>
+                </dd>
+              </dl>
+
             </div>
+            <% end %>
           </div>
+
+          <div class="swiper-button-prev fui-arrow-left"></div>
+          <div class="swiper-button-next fui-arrow-right"></div>
+          <div class="swiper-pagination pag-shoes"></div>
         </div>
-      </div>
+      </form>
+
     </div>
-    </div>
-    </div>
+  </div>
+
+</div>

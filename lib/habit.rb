@@ -34,7 +34,7 @@ module NodeOperations
 end
 
 class Habit
-  attr_accessor :id, :name, :aspect, :description, :date_of_initiation, :head_node
+  attr_accessor :id, :name, :aspect, :description, :date_of_initiation, :head_node, :is_atomic
   include NodeOperations
   include Enumerable
   require 'date'
@@ -47,7 +47,7 @@ class Habit
     }.merge(options) 
 =end
 
-  def initialize(id, name, aspect: '#', description: 'A habit', first_day_completed: false, existing_habit_history: nil, is_atomic: false)
+  def initialize(id, name, aspect: '', description: '', first_day_completed: false, existing_habit_history: nil, is_atomic: false)
     @id = id
     @name = name
     @is_atomic = is_atomic
