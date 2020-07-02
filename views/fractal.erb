@@ -22,9 +22,7 @@
         <%== @sub_info  %>
       </div>
 
-      <% length_of_habit = @habits.first.length %>
-
-      <form class="toggle_completed_day" action="" method="post">
+      <form class="toggle_completed_day" action="/habits/fractal/<%= "#{@habits.first.id}" %>" method="post">
         <!-- Hidden element will pass the index of the slide to the backend for persistence -->
         <input type="hidden" name="node_completed_index" value="" id="node-completed-index" />
 
@@ -32,16 +30,18 @@
           <div class="swiper-wrapper">
             <% # Add a swiper slide for each day that a habit was tracked. Days between last tracked day and current day are automatically filled in %>
             <% @habits.first.each_with_index do |node, idx| %>
-            <div class="swiper-slide" data-name="<%== "#{idx}-day-#{node.today}" %>">
+            <% date_today = @reference_date + (@length_of_habit - idx - 1) %>
+            <div class="swiper-slide" 
+            data-name="<%== "#{idx}-day-#{node.today}" %>"
+              data-date="<%== "<span>#{date_today.strftime '%d'}</span>" %>">
               <!-- Day specific information -->
               <dl class="h-flex">
                 <dt class="input-group-prepend"><span class="input-group-text">Days Tracked:</span></dt>
                 <dd class="habit-tracked-length"><%= @habits.first.length %></dd>
                 <dt class="input-group-prepend"><span class="input-group-text">Date:</span></dt>
                 <dd class="habit-tracked-day">
-                  <%= (@reference_date + (length_of_habit - idx - 1)).strftime "%d/%m/%Y" %></dd>
+                  <%= date_today.strftime "%d/%m/%Y" %></dd>
               </dl>
-S
               <!-- Habit specific information -->
               <dl class="v-flex habit-list">
                 <dt class="input-group-text">
@@ -50,11 +50,22 @@ S
                 <dd class="habit-tracked-toggle h-flex">
 
                     <!-- Toggle button -->
-                    <button class="btn btn-inverse">Tasks</button>
+                    <% if @habits.first.is_atomic %>
+                      
+                    <button class="btn btn-inverse">
+                      <a href="/habits/<%= @habits.first.id %>/list/<%= @habits.first.length - idx - 1 %>">Tasks</a>
+                    </button>
+                    <% end %>
+                    <button class="btn btn-info">
+                      <a href="/habits/<%= @habits.first.id %>">Summary</a>
+                    </button>
                     <div class="bootstrap-switch-square">
                       <input name="completed-day-<%= idx %>" id="completed-day-<%= idx %>" type="checkbox"
                         data-toggle="switch" data-on-text="<i class='fui-check'></i>"
-                        data-off-text="<i class='fui-cross'></i>" <%= if (node.today == 't') then "checked" end %> />
+                        data-off-text="<i class='fui-cross'></i>" 
+                        <% if (node.today == 't') %> checked <% end %> />
+                        <%= node.today %>
+                        
                     </div>
                 </dd>
               </dl>
@@ -65,7 +76,7 @@ S
 
           <div class="swiper-button-prev fui-arrow-left"></div>
           <div class="swiper-button-next fui-arrow-right"></div>
-          <div class="swiper-pagination pag-shoes"></div>
+          <div class="swiper-pagination pag-triangles"></div>
         </div>
       </form>
 

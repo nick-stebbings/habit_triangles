@@ -19,22 +19,21 @@
               adding 3 key habits for fulfilling this objective. Please use five words or less, separated by spaces.</p>
             <div class="col">
               <div class="row">
-                <div class="col-lg-9 offset-lg-1">
+                <div class="col">
                   <form name="new-objective-form" action="/" method="post">
                     <div class="input-group">
-                      <div class="input-group-prepend"><span class="input-group-text">Set An Objective</span></div>
-                      <input type="text" class="form-control" name="objective_name" />
+                      <div class="input-group-prepend">
+                        <label class="input-group-text" for="objective_name">Set An Objective</label>
+                      </div>
+                      <input type="text" class="form-control" name="objective_name" 
+                      placeholder="Objective description (in 5 words or less)" required />
                       <div class="input-group-append">
-                        <div class="dropdown btn-group">
-                          <button class="btn btn-info dropdown-toggle" data-toggle="dropdown"
-                            name="objective-aspect">Aspect</button>
-                          <div class="dropdown-menu">
-                            <a class="dropdown-item">#presentness</a>
-                            <a class="dropdown-item">#musicality</a>
-                            <a class="dropdown-item">#humour</a>
-                            <div class="dropdown-divider"></div>
-                          </div>
-                        </div>
+                        <select class="form-control" name="aspect_tag">
+                          <option value="" disabled selected>#life-aspect</option>
+                          <option value="#presentness">#presentness</option>
+                          <option value="#musicality">#musicality</option>
+                          <option value="#humour">#humour</option>
+                        </select>
                       </div>
                       <button class="btn btn-success" type="submit" id="create_new_objective_btn">Go!</button>
                     </div>
@@ -54,24 +53,24 @@
             <p class="card-text">Focus on one simple habit by creating it here:</p>
             <div class="col">
               <div class="row">
-                <div class="col-lg-9 offset-lg-1">
+                <div class="col">
                   <form name="new-habit-form" action="/" method="post">
                     <div class="input-group">
-                      <div class="input-group-prepend"><span class="input-group-text">Start A Habit</span></div><input
-                        type="text" class="form-control" name="habit_description" />
-                      <div class="input-group-append">
-                        <div class="dropdown btn-group">
-                          <button class="btn btn-info dropdown-toggle" data-toggle="dropdown" type="button"
-                            name="habit-aspect">Aspect</button>
-                          <div class="dropdown-menu">
-                            <a href="#" class="dropdown-item">#presentness</a>
-                            <a href="#" class="dropdown-item">#musicality</a>
-                            <a href="#" class="dropdown-item">#humour</a>
-                            <div class="dropdown-divider"></div>
-                          </div>
-                        </div>
-                        <button class="btn btn-success" type="submit" id="create_new_objective_btn">Go!</button>
+                      <div class="input-group-prepend">
+                        <label class="input-group-text">Start A Habit</label>
                       </div>
+                      <input
+                        type="text" class="form-control" name="habit_description"
+                        placeholder="Habit description (in 5 words or less)" required />
+                      <div class="input-group-append">
+                        <select class="form-control" name="aspect_tag">
+                          <option value="" disabled selected>#life-aspect</option>
+                          <option value="#presentness">#presentness</option>
+                          <option value="#musicality">#musicality</option>
+                          <option value="#humour">#humour</option>
+                        </select>
+                      </div>
+                      <button class="btn btn-success" type="submit" id="create_new_habit_btn">Go!</button>
                     </div>
                   </form>
                 </div>
@@ -86,18 +85,16 @@
         </div>
         <div data-parent="#choices" class="accordion-collapse collapse" id="learn-more">
           <div class="card-body">
-          <ul>
-            <p class="card-text">Here are some links about habit forming, and about the deeper psychology that informs
-              this project:
-            </p>
-            <li>
-              <a href="https://www.simplypsychology.org/maslow.html" target="_blank">Masolow's Heirarchy of Needs</a>
-            </li>
-            <li>
-              <a href="https://www.samuelthomasdavies.com/book-summaries/self-help/atomic-habits/" target="_blank">The
-              Theory Behind Atmomic Habit Forming</a></li>
-              <a class="btn btn-primary d-flex justify-content-sm-center" href="#">Learn more about habit philosophy</a>
-          </ul>
+            <p class="card-text">Here are some links about heirarchies of behaviour:</p>
+            <ul class="col-md-6">
+              <li>
+                <a href="https://www.simplypsychology.org/maslow.html" target="_blank">Masolow's Heirarchy of Needs</a>
+              </li>
+              <li>
+                <a href="https://www.samuelthomasdavies.com/book-summaries/self-help/atomic-habits/" target="_blank">The
+                  Theory Behind Atmomic Habit Forming</a></li>
+              <a class="btn btn-inverse d-flex justify-content-sm-center" href="#">More about what informed the project</a>
+            </ul>
           </div>
         </div>
       </div>

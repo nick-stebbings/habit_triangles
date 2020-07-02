@@ -1,7 +1,7 @@
 --- #Homepage copy
 :intro_page:
   :first: >
-    Welcome to *Happy Habit Triangles*
+    Welcome to **Happy Habit Triangles**
     
     In essence, this is a FRACTAL habit tracker.
 
@@ -10,29 +10,26 @@
   :second: This is the second
   
 :existing_objective:
-  :new: Here is your chance to make a fresh start in one of your patterns of behaviour. If you would like to 
+  :new: Here is your chance to make a fresh start in one of your patterns of behavior. If you would like to 
+
+  :old: Track the status of each of the sub-habits.
 
 :existing_habit:
   :new: >
-    You've created a new habit to track, so you're well on the way to establishing some new behaviour.
+    You've created a new habit to track, so you're well on the way to establishing some new behavior.
     Now let's break it down into smaller pieces. 
 
+  :old: >
+    View the progress of your habit(s).
+    
+    If you have decided that a habit needs breaking down further, go to its *Summary* page and set it to **Atomic**.
+
+    Go to the habit's *Objective* page to start stacking habits.
+
+    If the habit is Atomic, click *Tasks* to create a list of simple steps.
+
+  :sub_info: >
     We've given the habit a description, and a tag for the aspect of your life that it covers.
-    Now we want to find out if this is an _atomic_ habit, that we could reduce to a list of actions.
+    Now we want to find out if this is an **atomic** habit, that we could reduce to a list of actions.
 
-    Check the box once you've decided if it is atomic, then click 'start tracking'.
-
-    To decide, ask yourself this:
-    - Is it a general behaviour, like 'eat healthy food'?
-    - Or is it a specific set of actions?
-
-# :extra_info: >
-#     This application fuses a few useful productivity and lifestyle hacks that I have encountered and found to be useful.
-
-#     After beginning my studies at [Launch School](https://launchschool.com) I was introduced to a different way of learning. To encourage a focus on mastery in my education, I was pointed toward the book ['Mastery : the keys to long-term success and fulfillment'](https://archive.org/details/masterykeystolon00leon) by George Leonard.
-#     The key takeaway is the emphasis on process, rather than results. Proper process is the way to build skill. It takes as long as it takes.
-
-#     In my personal life I have been drawn towards habit tracking apps, as a way of creating stability in my day-to-day schedule.
-#     I find they can be useful, but a linear approach to monitoring personal behaviour, in my life, often breaks down. When I break a habit streak I feel like everything is broken!
-
-#     In order to drill down into the details of why I do and don't do certain things, I am making this application.
+    Check the box once you've decided if it is _atomic_, then click 'start tracking'.

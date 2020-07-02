@@ -359,7 +359,7 @@ post /\/habits\/fractal((\/(?:\d{1,})){1,})/ do
   @habit = @habits.first
   day_toggle_switch_value = ("completed-day-" + params[:node_completed_index])
   habit_node_for_day = @habit.get_nth(params[:node_completed_index].to_i)
-  
+  binding.pry
   habit_node_for_day.today = params.key?(day_toggle_switch_value) ? 't' : 'f'
   redirect "/habits/fractal/#{@habit.id}"
 end

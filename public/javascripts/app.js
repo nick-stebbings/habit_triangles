@@ -2,20 +2,22 @@
 $(function () {
   $('[data-toggle="switch"]').bootstrapSwitch();
 
-  $('#fractal .bootstrap-switch-label').click(function () {
+  $("#fractal .bootstrap-switch-label").click(function () {
     let currentDataName = $(this).closest(".swiper-slide").attr("data-name");
-    let newDataName = 'f';
-    console.log(currentDataName, newDataName);
+    let toggledValue = currentDataName.slice(-1) === "t" ? "f" : "t";
+    let newDataName = currentDataName.slice(0, -1) + toggledValue;
+    let nodeInfo = newDataName[0];
 
     $(this).closest(".swiper-slide").attr("data-name", newDataName);
 
-    $('#node-completed-index').val($(this).closest(".swiper-slide").attr("data-swiper-slide-index"));
+    // Pass the index of the linked list node to alter
+    $("#node-completed-index").val(nodeInfo);
 
     $(this).closest("form").submit();
   });
 
-  $('.todo').on('click', 'li', function () {
-    $(this).toggleClass('todo-done');
+  $(".todo").on("click", "li", function () {
+    $(this).toggleClass("todo-done");
   });
 
   $("button.btn-danger").click(function (event) {
@@ -36,17 +38,29 @@ $(function () {
     resistanceRatio: 0.2,
     loopAdditionalSlides: 0,
     cssMode: true,
-    pagination: '.pag-shoes',
-    bulletClass: 'swiper-pagination-bullet',
-    currentClass: 'swiper-pagination-current',
+    pagination: ".pag-triangles",
+    bulletClass: "swiper-pagination-bullet",
+    currentClass: "swiper-pagination-current",
     nextButton: ".swiper-button-next",
     prevButton: ".swiper-button-prev",
     paginationBulletRender: function (index, className) {
-      var currentSlide = $('.' + this.wrapperClass).find('.swiper-slide')[index];
-      var dayCompletedClass = ($(currentSlide).attr('data-name').slice(-1) == 't') ? "success" : "warning"
-      var bulletStyles = '<span class="' + className + ' progress-bar progress-bar-' + dayCompletedClass + '">' + $(currentSlide).attr('data-date') + '</span>';
-      return bulletStyles
-    }
-    paginationClickable: true
+      var currentSlide = $("." + this.wrapperClass).find(".swiper-slide")[
+        index
+      ];
+      var dayCompletedClass =
+        $(currentSlide).attr("data-name").slice(-1) == "t"
+          ? "success"
+          : "notyet";
+      var bulletStyles =
+        '<span class="' +
+        className +
+        " triangle triangle-" +
+        dayCompletedClass +
+        '">' +
+        $(currentSlide).attr("data-date") +
+        "</span>";
+      return bulletStyles;
+    },
+    paginationClickable: true,
   });
 });

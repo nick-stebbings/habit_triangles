@@ -1,76 +1,59 @@
-
 <form action="<%= "/habits/#{@habit.id}/update" %>" method="post">
-    <div class="form-group">
-        <div class="input-group-prepend"><span class="input-group-text">Description</span></div>
-        <input type="text" class="form-control login-field" name="habit_description" value="" placeholder="<%= @habit.description %>" id="habit-description">
-        <label class="login-field-icon" for="habit-description"></label>
-    </div>
-
-    <div class="form-group">
-        <div class="input-group-prepend"><span class="input-group-text">Aspect</span></div>
-        <input type="text" class="form-control login-field" name="aspect_tag" value=""
-            placeholder="<%= @habit.aspect %>" id="habit-aspect">
-        <label class="login-field-icon" for="habit-aspect"></label>
-    </div>
-
-    <div class="form-group">
-        <div class="input-group-prepend"><span class="input-group-text">Initiation Date</span></div>
-        <input type="date" class="form-control login-field" name="date_of_initiation"
-            value="<%= @habit.date_of_initiation.strftime('%Y-%m-%d') %>"
-            placeholder="<%= @habit.date_of_initiation %>" id="habit-start-date">
-        <label class="login-field-icon" for="habit-start-date"></label>
-    </div>
-
-    <div class="form-group">
-        <div class="input-group-prepend"><span class="input-group-text">Atomic?</span></div>
-        <div class="bootstrap-switch-square">
-            <div
-                class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-animate bootstrap-switch-id-custom-switch-03 bootstrap-switch-off">
-                <div class="bootstrap-switch-container"><span
-                        class="bootstrap-switch-handle-on bootstrap-switch-primary"><span
-                            class="fui-check"></span></span><label
-                        class="bootstrap-switch-label">&nbsp;</label><span
-                        class="bootstrap-switch-handle-off bootstrap-switch-default"><span
-                            class="fui-cross"></span></span><input type="checkbox" checked=""
-                        data-toggle="switch" id="custom-switch-03"
-                        data-on-text="<span class='fui-check'></span>"
-                        data-off-text="<span class='fui-cross'></span>"></div>
-            </div>
+    <fieldset>
+        <div class="input-group side-by-side">
+            <div class="input-group-prepend"><span class="input-group-text">Description</span></div>
+            <input type="text" class="form-control" name="habit_description" value="<%= @habit.description %>"
+                placeholder="Describe the behaviour" required
+                id="habit-description">
+            <label class="fui-new" for="habit-description"></label>
         </div>
-    </div>
 
-    <div class="row">
-        <div class="col sm-6">
-            <button class="btn btn-inverse btn-lg btn-block" type="submit">Update Habit Details</button>
-            </form>
+        <div class="input-group side-by-side">
+            <div class="input-group-prepend"><span class="input-group-text">Aspect</span></div>
+            <input type="text" class="form-control" name="aspect_tag" value="<%= @habit.aspect %>"
+                placeholder="#use-this-tag-format" required
+                id="habit-aspect">
+            <label class="fui-tag" for="habit-aspect"></label>
         </div>
-        <div class="col sm-6">
-            <form class="delete" action="<%= "/habits/#{@habit.id}/delete" %>" method="post">
-                <button class="btn btn-danger btn-lg btn-block " type="submit">Delete this habit</button>
-            </form>
-        </div>
-    </div>
-    <div class="card col-sm-8 offset-2">
 
-        <div class="row">
-            <div class="card-header col sm-3">
-                <p class="text-center">Today's completion status</p>
-            </div>
-            <div class="card-header col sm-3">
-                <p class="text-center">Running streak for this habit</p>
-            </div>
+        <div class="input-group side-by-side">
+            <div class="input-group-prepend"><span class="input-group-text">Initiation Date</span></div>
+            <input type="date" class="form-control" name="date_of_initiation"
+                value="<%= @habit.date_of_initiation.strftime('%Y-%m-%d') %>" id="habit-start-date">
+            <label class="fui-calendar" for="habit-start-date"></label>
         </div>
-        
-        <div class="row">
-            <div class="card-body sm-3 offset-3">
-                <div class="check-box text-justify <%= !!@habit.head_node.today ? 'fui-check' : 'fui-cross' %>">
+    </fieldset>
+    <fieldset class="h-flex">
+        <div class="input-group side-by-side">
+            <div class="v-flex">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Atomic?</span>
+                </div>
+
+                <div class="bootstrap-switch-square">
+                    <input name="is_atomic" id="is_atomic" type="checkbox" data-toggle="switch"
+                        data-on-text="<i class='fui-check'></i>" data-off-text="<i class='fui-cross'></i>"
+                        <%= if @habit.is_atomic then "checked" end %> />
                 </div>
             </div>
-            <div class="card-body sm-3 offset-5 justify-content-sm-center">
-                <span class="streak-count"><%= calculate_streak(@habit) %></span>
-            </div>
+
+            <button class="btn btn-inverse" type="submit">Update Habit Details</button>
+            <button class="btn btn-danger" formaction="<%= "/habits/#{@habit.id}/delete" %>">Delete This
+                Habit</button>
         </div>
-    
-        <a href="<%= "/habits/#{@habit.id}/fractal" %>" class="btn btn-primary btn-lg btn-block">Track Habit</a>
+    </fieldset>
+
+</form>
+
+<div class="h-flex">
+    <div class="card-header">Today?</div>
+    <div class="card-body">
+        <div class="tick-box <%= @habit.head_node.today == 't' ? 'fui-check' : 'fui-cross' %>"></div>
     </div>
+    <div class="card-header">Streak:</div>
+    <div class="card-body">
+        <span class="streak-count"><%= calculate_streak(@habit) %></span>
+    </div>
+
+    <a href="<%= "/habits/fractal/#{@habit.id}" %>" class="btn btn-primary btn-lg btn-block">Track Habit</a>
 </div>

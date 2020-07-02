@@ -1,6 +1,12 @@
 
-            <% @objective.habits.each_with_index do |habit, idx| %>
+          <% if !@objective.nil? %>
+          <a href="<%= "/objectives/#{@objective.id}/update" %>" class="btn btn-info btn-lg btn-block">Update Objective
+            Summary</a>
+          <% end %>
 
+          <% collection = @objective.nil? ? @habits : @objective.habits %>
+          <% collection.each_with_index do |habit, idx| %>
+  
             <div class="row">
               <div class="col">
                 <div class="table-responsive">
@@ -32,8 +38,8 @@
                           Update Details
                         </td>
                         <td>
-                          <a href="<%= "/habits/#{habit.id}/update" %>" class="btn btn-warning btn-lg btn-block">Habit Summary</a>
-                          <a href="<%= "/habits/#{habit.id}/fractal" %>" class="btn btn-primary btn-lg btn-block">Track
+                          <a href="<%= "/habits/#{habit.id}/update" %>" class="btn btn-warning btn-lg btn-block">Update Habit Summary</a>
+                          <a href="<%= "/habits/fractal/#{habit.id}" %>" class="btn btn-primary btn-lg btn-block">Track
                             Habit</a>
                         </td>
                       </tr>

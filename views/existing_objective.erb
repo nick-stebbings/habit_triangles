@@ -1,0 +1,43 @@
+<h3>Let's use it to test out some headers!</h3>
+<% habits = @objective.habits %>
+<% habit_ids = habits.map { |h| h.id.to_s } %>
+<div class="input-group side-by-side">
+  <div class="input-group-prepend"><span class="input-group-text">Name</span></div>
+  <input type="text" class="form-control" name="objective_name" value="<%= @objective.name %>"
+    placeholder="Describe the behaviour" required id="objective-name">
+  <label class="fui-new" for="objective-name"></label>
+</div>
+
+<div class="input-group side-by-side">
+  <div class="input-group-prepend"><span class="input-group-text">Description</span></div>
+  <input type="text" class="form-control" name="objective_description" value="<%= @objective.description %>"
+    placeholder="Describe the behaviour" required id="objective-description">
+  <label class="fui-new" for="objective-description"></label>
+</div>
+
+<div class="input-group side-by-side">
+  <div class="input-group-prepend"><span class="input-group-text">Aspect (most common)</span></div>
+  <input disabled type="text" class="form-control" name="aspect_tag" value="<%= habits.first.aspect %>">
+  <label class="fui-tag" for="aspect-tag"></label>
+</div>
+
+<div class="input-group side-by-side">
+  <div class="input-group-prepend"><span class="input-group-text">Initiation Date</span></div>
+  <input type="date" class="form-control" name="date_of_initiation"
+    value="<%= habits.first.date_of_initiation.strftime('%Y-%m-%d') %>" id="objective-start-date">
+  <label class="fui-calendar" for="objective-start-date"></label>
+</div>
+
+<div class="h-flex">
+  <div class="card-header">Running Streaks:</div>
+  <div class="card-body">
+    <% habits.each do |h| %>
+      <span class="streak-count"><%= calculate_streak(h) %></span>
+      <a href="<%= "/habits/fractal/#{h.id}" %>" class="btn btn-info btn-lg btn-block">Track Habit</a>
+    <% end %>
+  </div>
+
+</div>
+
+<a href="<%= "/habits/#{@habit.id}/update" %>" class="btn btn-warning btn-lg btn-block">Update Objective Details</a>
+<a href="<%= "/habits/fractal/#{habit_ids.join('/')}" %>" class="btn btn-primary btn-lg btn-block">Track Habits Fractally</a>

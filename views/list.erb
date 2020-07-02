@@ -1,0 +1,63 @@
+<section role="action-list" class="v-flex">
+  <header>
+    <div class="input-group side-by-side">
+      <div class="input-group-prepend"><span class="input-group-text">Habit Name:</span></div>
+      <%= @name.split("_").join(" ") %>
+      <form action="/habits/<%= @habit_id %>/list/<%= @list_id %>/complete_all" method="post">
+        <button class="btn btn-primary" type="submit">Complete Habit for Today
+        </button>
+        <button class="btn btn-warning" type="submit"
+          formaction="/habits/<%= "#{@habit_id}" + completed_list_redirection(@habit_id, @list_id) %>">Save Progress
+        </button>
+      </form>
+    </div>
+  </header>
+  <div class="todo">
+    <ul>
+      <% sort_todos(@list[:todos]) do |task, idx| %>
+      <% if task[:completed] %>
+
+      <li class="todo-done h-flex">
+        <% else %>
+      <li class="h-flex">
+        <% end %>
+        <form action="/habits/<%= @habit_id %>/list/<%= @list_id %>/actions/<%= idx %>/delete" method="post"
+          class="delete">
+          <button type="submit" class="destroy_btn" id="destroy_btn_<%= idx %>"></button>
+          <label for="destroy_btn_<%= idx %>">
+            <div class="todo-icon fui-trash"></div>
+          </label>
+        </form>
+        <div class="todo-content">
+          <h2 class="todo-name">
+            <%= task[:name] %>
+          </h2>
+        </div>
+      </li>
+
+      <form action="/habits/<%= @habit_id %>/list/<%= @list_id %>/actions/<%= idx %>" method="post" class="check">
+        <input type="hidden" name="completed" value="<%= !task[:completed] %>" />
+        <button class="complete_btn" type="submit" id="complete_btn_<%= idx %>">Complete</button>
+        <label for="complete_btn">
+        </label>
+      </form>
+      </li>
+
+      <% end %>
+    </ul>
+  </div>
+</section>
+<form action="/habits/<%= @habit_id %>/list/<%= @list_id %>/actions" method="post">
+  <div class="input-group side-by-side">
+    <label for="todo">
+      <div class="input-group-prepend"><span class="input-group-text">Add an Action:</span></div>
+    </label>
+
+    <input name="todo" id="todo" class="form-control" placeholder="A tiny step" type="text"
+      value="<%= params[:todo] %>">
+
+    <fieldset>
+      <button class="btn btn-inverse" type="submit">List Action</button>
+    </fieldset>
+</form>
+</section>

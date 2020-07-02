@@ -31,7 +31,8 @@ module NodeOperations
 
   # Fill in days between last day completed and today
   def update_to_today! 
-    days_left = Date.today.jd - date_of_initiation.jd
+    #Compare julian days
+    days_left = Date.today.jd - date_of_initiation.jd 
     (days_left - length).times { push('f') } unless length == days_left
   end
 end
@@ -45,16 +46,18 @@ class Habit
   include Enumerable
   require 'date'
 
-  def initialize(id, name, aspect: '', description: '', **options)
+  def initialize(id, name, **options)
     options = {
-      is_atmomic: false,
+      aspect: '#a-default-tag',
+      description: 'A generic description',
+      is_atomic: false,
     }.merge(options) 
 
     @id = id
     @name = name
-    @aspect = aspect
-    @description = description
-    @is_atomic = is_atomic
+    @aspect = options[:aspect]
+    @description = options[:description]
+    @is_atomic = options[:is_atomic]
     @date_of_initiation = Date.today
     @head_node = push('f')
   end

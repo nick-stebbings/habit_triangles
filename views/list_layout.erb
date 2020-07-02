@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="/css/flat-ui.css">
   <!-- App specific styles -->
   <link rel="stylesheet" href="/stylesheets/app.css">
+  <link rel="stylesheet" href="/stylesheets/list.css">
 </head>
 
 <body>
@@ -32,7 +33,6 @@
         <div class="jumbotron m-auto">
           <h1 class="text-center"><%= @page_title %></h1>
           
-          <%== in_paragraphs(@intro_spiel) unless session[:message] %>
           <% if session[:message] %>
           <div class="alert alert-warning" role="alert">
             <%= session.delete(:message) %>
@@ -46,7 +46,6 @@
       <div class="col">
         <div class="card">
           <div class="card-header">
-            <%== @sub_info  %>
           </div>
           <div class="card-body">
             <%== yield %>
@@ -58,8 +57,8 @@
 
   <script src="" async defer></script>
   <!-- Loading JS Assets -->
-  <script src="/javascripts/jquery-3.4.0.js"></script>
-  <script src="/javascripts/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/popper.js@1.14.1/dist/umd/popper.min.js" crossorigin="anonymous"></script>
   <script src="/javascripts/flat-ui.js"></script>
   <script src="/javascripts/app.js"></script>
 </body>
