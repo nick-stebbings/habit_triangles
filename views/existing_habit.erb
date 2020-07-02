@@ -1,29 +1,41 @@
-<div>
-  <%= @habit.description %>
+<h3>Let's use it to test out some headers!</h3>
+<div class="input-group side-by-side">
+  <div class="input-group-prepend"><span class="input-group-text">Name</span></div>
+  <input type="text" class="form-control" name="objective_name" value="<%= @objective.name %>"
+    placeholder="Describe the behaviour" required id="objective-name">
+  <label class="fui-new" for="objective-name"></label>
 </div>
-<div>
-  <%= @habit.aspect %>
-</div>
-<div>
-  <%= @habit.date_of_initiation %>
-</div>
-<% @habit.each_node_completed? do |day| %>
-  <card-body class="sm-3 offset-3">
-    <div class="text-justify check-box <%= day == 't' ? 'fui-check' : 'fui-cross' %>">
-    </div>
-  </card-body>
-<% end %>
 
-<div class="col-sm-8 offset-2">
-  <div class="row">
-    <card-header class="col sm-3">
-      <p class="text-center">Running streak for this habit</p>
-    </card-header>
-  </div>
-  <div class="row">
-    <card-body class="sm-3 offset-5 justify-content-sm-center">
-      <span class="streak-count"><%= calculate_streak(@habit) %></span>
-    </card-body>
-  </div>
-  <a href="<%= "/habits/#{@habit.id}/fractal" %>" class="btn btn-primary btn-lg btn-block">Track Habit</a>
+<div class="input-group side-by-side">
+  <div class="input-group-prepend"><span class="input-group-text">Description</span></div>
+  <input type="text" class="form-control" name="objective_description" value="<%= @objective.description %>"
+    placeholder="Describe the behaviour" required id="objective-description">
+  <label class="fui-new" for="objective-description"></label>
 </div>
+
+<div class="input-group side-by-side">
+  <div class="input-group-prepend"><span class="input-group-text">Aspect (most common)</span></div>
+  <input disabled type="text" class="form-control" name="aspect_tag" value="<%= @objective.habits.first.aspect %>">
+  <label class="fui-tag" for="aspect-tag"></label>
+</div>
+
+<div class="input-group side-by-side">
+  <div class="input-group-prepend"><span class="input-group-text">Initiation Date</span></div>
+  <input type="date" class="form-control" name="date_of_initiation"
+    value="<%= @habits.first.date_of_initiation.strftime('%Y-%m-%d') %>" id="objective-start-date">
+  <label class="fui-calendar" for="objective-start-date"></label>
+</div>
+
+<div class="h-flex">
+  <div class="card-header">Running Streaks:</div>
+  <div class="card-body">
+    <% habits.each do |h| %>
+      <span class="streak-count"><%= calculate_streak(h) %></span>
+      <a href="<%= "/habits/fractal/#{h.id}" %>" class="btn btn-info btn-lg btn-block">Track Habit</a>
+    <% end %>
+  </div>
+
+</div>
+
+<a href="<%= "/habits/#{@habit.id}/update" %>" class="btn btn-warning btn-lg btn-block">Update Objective Details</a>
+<a href="<%= "/habits/fractal/#{habit_ids.join('/')}" %>" class="btn btn-primary btn-lg btn-block">Track Habits Fractally</a>
