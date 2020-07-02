@@ -30,42 +30,27 @@ end
 
 # For list module
 helpers do
-  def get_task_list(list_idx)
-    session[:lists][list_idx][:todos]
+  def get_task_list(habit_id, habit_list_id)
+    session[:lists].find { |l| (l[:habit_id] = habit_id) && (l[:habit_list_id] == habit_list_id) }
   end
 
-  def list_completed?(list_idx)
-    tasks = get_task_list(list_idx)
-    tasks.all? { |task| task[:completed] } && tasks.size > 0
-  end  
-
-  def incomplete_tasks(list_idx)
-    get_task_list(list_idx).reject { |task| task[:completed] }
+  def incomplete_tasks(habit_id, habit_list_id)
+    get_task_list(habit_id, habit_list_id)[:todos].reject { |task| task[:completed] }.size
   end
 
-  def incomplete_tasks_string(list_idx)
-    "#{incomplete_tasks(list_idx).size}/#{list_size(list_idx)}"
+  # After checking if a list is in a completed state, redirect accordingly
+  def completed_list_redirection(habit_id, habit_list_id)
+    new_url_string = "/list/#{habits_last_list(habit_id)[:habit_list_id]}/complete_all"
+    incomplete_tasks(habit_id, habit_list_id).zero? ? new_url_string : ""
   end
 
-  def list_size(list_idx)
-    get_task_list(list_idx).size
+  def reset_list!(list)
+    list[:todos].each { |t| t[:completed] = false }
   end
 
-  def sort_lists(list)
-    completed = 
-    {  false: [],
-        true: []
-    }
-    list.each_index do |idx|
-      list_completed?(idx) ? completed[:true].push(idx) : completed[:false].push(idx) 
-    end
-
-    completed.each do |_, arr|
-      list.each_with_index do |list, idx|
-        yield(list, idx) if arr.include?(idx)
-      end
-    end
-  end
+  # def incomplete_tasks_string(habit_id, habit_list_id)
+  #   "#{incomplete_tasks(habit_id, habit_list_id)}/#{list_size(habit_list_id)}"
+  # end
 
   # Sort Todos on a list by "completed". 
   def sort_todos(list)
@@ -109,17 +94,24 @@ def get_objective(id)
 end
 
 def get_next_id(of)  # Return next id in overall objectives hash/habits ary
-    case of
-    when :objective
-      max = session[:objectives].values.map { |objective| objective.id }.max || 0
-    when :habit
-      max = session[:habits].map { |habit| habit.id }.max || 0
-    end
-    max + 1
+  case of
+  when :objective
+    max = session[:objectives].values.map { |objective| objective.id }.max || -1
+  when :habit
+    max = session[:habits].map { |habit| habit.id }.max || -1
+  end
+  max + 1
+end
+
+def habits_last_list(habit_id)
+  all_lists_for_habit = session[:lists].select do |list|
+    list[:habit_id] == habit_id
+  end
+  all_lists_for_habit.max_by { |l| l[:habit_list_id] }
 end
 
 def valid_objective_name?(phrase)
-  phrase.match? %r{^(?:\w* ){0,4}\w+$} # Matches 'up to five words split by a space' format
+phrase.match? %r{^(?:\w* ){0,4}\w+$} # Matches 'up to five words split by a space' format
 end
 
 def valid_habit_description?(phrase)
@@ -139,6 +131,16 @@ def get_objective_key_by_habit(id)
   nil
 end
 
+def list_exists?(habit_id, h_list_id)
+  session[:lists].any? { |l| l[:habit_id] == habit_id && l[:habit_list_id] == h_list_id}
+end
+
+def update_habit_after_list_completed!(habit_id, node_index)
+  node = get_habit(habit_id).get_nth(node_index)
+  return nil if node.today == 't'
+  node.today = 't'
+end
+
 def calculate_streak(habit)
   count = 0
   habit.each_node_completed? do |node_data|
@@ -148,7 +150,7 @@ def calculate_streak(habit)
   count
 end
 
-# helpers do
+# old helpers do
   def in_paragraphs(text)
     text.split("\n").map { |para| "<p>#{para}</p>" }.join
   end
@@ -180,18 +182,18 @@ error do
 end
 
 get "/" do
-  if session[:objectives].empty?
+  # if session[:objectives].empty?
     @page_title = 'Happy Habit Triangles'
     @intro_spiel = render_markdown(TEXT[:intro_page][:first])
     erb :index
-  else
-    current_objective = session[:objectives].values.min_by { |objective| objective.id } #this criteria will change
-    redirect "/objectives/#{current_objective.id}"
-  end
+  # else
+  #   current_objective = session[:objectives].values.min_by { |objective| objective.id } #this criteria will change
+  #   redirect "/objectives/#{current_objective.id}"
+  # end
 end
 
 post "/" do # Process front page choice of new objective or new habit
-            # We pass a query parameter to indicate first app use to lead the user through
+  # We pass a query parameter to indicate first app use to lead the user through
   first_habit = nil
 
   if !!params[:objective_name] && valid_objective_name?(params[:objective_name].strip)
@@ -200,18 +202,30 @@ post "/" do # Process front page choice of new objective or new habit
     # Instantiate a new objective with 3 new habits, redirect to a page to flesh out the first habit
     objective_id = get_next_id(:objective) 
 
-    session[:objectives][objective_name] = Objective.new(objective_id, Array.new(3){ |i| Habit.new(get_next_id(:habit) + i, objective_name + "_cornerstone_#{i}") }, objective_name.strip )
+    # Add 3 new habits to a new objective instance
+    new_habit_ary = Array.new(3) do |i|
+      habit_id = get_next_id(:habit) + i
+      habit_name = objective_name + "_cornerstone_#{i}"
+      opt = { aspect: params[:aspect_tag] }
+
+      Habit.new(habit_id, habit_name, opt) 
+    end
+    session[:objectives][objective_name] = Objective.new(objective_id, new_habit_ary, objective_name)
+
+    # Add them to the overall habit list, too
     session[:objectives][objective_name].habits.each do |habit|
       session[:habits] << habit
-    end # Added 3 new habits to the objective object
-    
+    end
+    # Our first habit to flesh out
     first_habit = session[:objectives][objective_name].habits.first
   elsif !!params[:habit_description] && valid_habit_description?(params[:habit_description].strip)
     habit_name = snake_case(params[:habit_description])
-    first_habit = Habit.new(get_next_id(:habit), habit_name, first_day_completed: true)
+    # Out only habit to flesh out
+    first_habit = Habit.new(get_next_id(:habit), habit_name, aspect: params[:aspect_tag])
+    # Add it to the overall habit list
     session[:habits] << first_habit
   else
-    session[:message] = MESSAGES[:invalid_objective_name] # // get this to choose a relevant message
+    session[:message] = MESSAGES[:invalid_objective_name]
     halt 422, erb(:index) if session[:message]
   end
   redirect "/habits/#{first_habit.id}/update?initial=true"
@@ -221,15 +235,34 @@ get "/objectives/:id/update" do |id|
   @objective = get_objective(id.to_i)
   @habits = @objective.habits
 
-  erb :update_objective
+  @page_tite = "List of Habits"
+  @intro_spiel = "This dashboard allows you to take a quick glance at a list of habits - those linked by objective or all habits in the system."
+  @sub_info = "This is a list of habits for the objective named <b>#{@objective.name}</b>."
+  
+  erb :update_objective, :layout => :layout
 end
 
 get "/objectives/:id" do |id|
   @objective = get_objective(id.to_i)
 
-  @page_title = "List of Habits"
+  @page_tite = "List of Habits"
+  @intro_spiel = "This dashboard allows you to take a quick glance at a list of habits - those linked by objective or all habits in the system."
+  @sub_info = "This is a list of habits for the objective named <b>#{@objective.name}</b>."
+  erb :index_habits, :layout => :simple_layout
+end
+
+get "/objectives/:id/update" do |id|
+  @objective = get_objective(id.to_i)
+  @page_title = "Objective Summary"
   @intro_spiel = "This is a list of habits for the objective named <b>#{@objective.name}</b>."
-  erb :list_habits, :layout => :simple_layout
+  erb :update_objective, :layout => :simple_layout
+end
+
+get "/habits" do
+  @page_title = "List of Habits"
+  @intro_spiel = "This is a list of all habits."
+  @habits = session[:habits]
+  erb :index_habits, :layout => :simple_layout
 end
 
 # depreciated, creating single habits is not the point
@@ -240,50 +273,31 @@ end
 # end
 
 get "/habits/:id" do |id|
-  @habit = get_habit(id.to_i)
-  halt 404 unless @habit
+  @habits = [get_habit(id.to_i)]
+  halt 404 unless @habits
 
   @page_title = "Habit Overview"
-  @intro_spiel = "This is the summary information for your habit with identifier <b>#{@habit.name}.</b>"
-  erb :existing_habit, :layout => :simple_layout
+  @intro_spiel = "This is the summary information for your habit with identifier <b>#{@habits.first.name}.</b>"
+  erb :index_habits, :layout => :simple_layout
 end
 
 get "/habits/:id/update" do |id|
   @habit = get_habit(id.to_i)
   
   @intro_spiel = params[:initial] ? TEXT[:existing_habit][:new] : 'This is just an old habit.'
-  @sub_info = TEXT[:existing_habit][:sub_info]
+  @sub_info = render_markdown(TEXT[:existing_habit][:sub_info])
   @page_title = "Update Habit Summary"
   erb :update_habit, :layout => :simple_layout
 end
 
-get /\/habits\/fractal((\/(?:\d{1,})){1,})/ do
-  # Split habit_id parameters into an array of integers
-  habits_in_chain = params['captures'].first.split("/")[1..-1].map(&:to_i)
-
-  @habits = habits_in_chain.map { |id| get_habit(id) }
-  @habits.each { |h| h.update_to_today! }
-  binding.pry
-
-  @intro_spiel = render_markdown(params[:initial] ? TEXT[:existing_habit][:new] : TEXT[:existing_habit][:old])
-  @page_title = "Fractal Habit Triangle"
-  @reference_date = @habits.max_by { |h| h.length }.date_of_initiation
-  erb :fractal
-end
-
-post /habits\/fractal((?:\/(?:\d{1,})){1,})/ do |id|
-  @habit = get_habit(id.to_i)
-  day_toggle_switch_value = ("completed-day-" + params[:node_completed_index]).to_sym
-  habit_node_for_day = @habit.get_nth(params[:node_completed_index].to_i)
-  
-  habit_node_for_day.today = params.key?(day_toggle_switch_value) ? 't' : 'f'
-  redirect "/habits/fractal/#{id}"
+post "/habits/:id" do |id|
+  redirect "/habits/#{id}"
 end
 
 post "/habits/:id/update" do |id|
   @habit = get_habit(id.to_i)
   @intro_spiel = params[:initial] ? TEXT[:existing_habit][:new] : TEXT[:existing_habit][:old]
-  @sub_info = TEXT[:existing_habit][:sub_info]
+  @sub_info = render_markdown(TEXT[:existing_habit][:sub_info]) 
   @page_title = "Update Habit Summary"
 
   session[:message] = MESSAGES[:invalid_habit_description] unless valid_habit_description?(params[:habit_description])
@@ -297,9 +311,22 @@ post "/habits/:id/update" do |id|
     @habit.description = params[:habit_description].strip
     @habit.date_of_initiation = date
     @habit.aspect = params[:aspect_tag].strip
-    # @habit.head_node.today = (params[:completed_today] == 't') ? 't' : 'f'
+    @habit.is_atomic = (params[:is_atomic] == 'on')
+    @habit.update_to_today! 
+    list_id = @habit.length - 1
+    
+    if @habit.is_atomic && !list_exists?(id, list_id)
+      @intro_spiel = "This is some action list intro."
+      
+      last_list = habits_last_list(id.to_i)
+      
+      last_todos = last_list[:todos] unless last_list.nil?
+      new_list_duplicate = { habit_id: id.to_i, todos: (last_todos || []), habit_list_id: (!last_list ? 0 : list_id) }
+      reset_list!(new_list_duplicate)
+      session[:lists] << new_list_duplicate unless list_exists?(id.to_i, list_id)
+      redirect "/habits/#{id}/list/#{new_list_duplicate[:habit_list_id]}" 
+    end
   end
-
   redirect "/habits/#{id}"
 end
 
@@ -310,49 +337,87 @@ post "/habits/:id/delete" do |id|
   redirect "/objectives/#{objective.id}"
 end
 
+## Fractal Habit Triangle
+
+get /\/habits\/fractal((\/(?:\d{1,})){1,})/ do
+  # Split habit_id parameters into an array of integers
+  habits_in_chain = params['captures'].first.split("/")[1..-1].map(&:to_i)
+  @habits = habits_in_chain.map { |id| get_habit(id) }
+  @habits.each { |h| h.update_to_today! }
+  @length_of_habit = @habits.first.length
+
+  @intro_spiel = render_markdown(params[:initial] ? TEXT[:existing_habit][:new] : TEXT[:existing_habit][:old])
+  @page_title = "Fractal Habit Triangle"
+  @reference_date = @habits.max_by { |h| h.length }.date_of_initiation
+  erb :fractal
+end
+
+post /\/habits\/fractal((\/(?:\d{1,})){1,})/ do
+  habits_in_chain = params['captures'].first.split("/")[1..-1].map(&:to_i)
+  @habits = habits_in_chain.map { |id| get_habit(id) }
+
+  @habit = @habits.first
+  day_toggle_switch_value = ("completed-day-" + params[:node_completed_index])
+  habit_node_for_day = @habit.get_nth(params[:node_completed_index].to_i)
+  
+  habit_node_for_day.today = params.key?(day_toggle_switch_value) ? 't' : 'f'
+  redirect "/habits/fractal/#{@habit.id}"
+end
+
 ## Todo List Modular Routes
 
 # Create a new list attached to Atomic Habit id
-post "/habits/:id/lists" do |id|
-  list_name = params[:habit_name].strip
-  session[:lists] << { name: list_name, todos: []}
-  session[:message] = "The list has been created."  
-  redirect "/habits/#{id}" 
-end
+# post "/habits/:id/list" do |id|
+#   list_name = params[:habit_name].strip
+#   session[:lists] << { name: list_name, todos: []}
+#   session[:message] = "The list has been created."  
+#   redirect "/habits/#{id}" 
+# end
 
 # View a list
-get "/lists/:id" do
+get "/habits/:habit_id/list/:list_id" do |habit_id, list_id|
   @page_title = "View Habit Actions"
-  @list_id = params[:id].to_i
-  @list = session[:lists][@list_id]
+  @habit_id = habit_id.to_i
+  @list_id = list_id.to_i
+  @name = get_habit(habit_id.to_i).name
+  @list = get_task_list(@habit_id, @list_id)
+  
   erb :list, :layout => :list_layout
 end
 
-# Delete existing List
-post "/lists/:id/delete" do
-  id = params[:id].to_i
-  session[:lists].delete_at(id)
-  session[:message] = "The list has been deleted."
-  redirect "/lists"
-end
-
 # Complete all tasks on a list
-post "/lists/:id/complete_all" do |id|
-  id = id.to_i
-  @list = session[:lists][id]
+post "/habits/:habit_id/list/:list_id/complete_all" do |habit_id, list_id|
+  @habit_id = habit_id.to_i
+  @list_id = list_id.to_i
+  @list = get_task_list(@habit_id, @list_id)
 
   @list[:todos].each do |task|
     task[:completed] = true
   end
-
+  length_of_habit = get_habit(@habit_id).length
+  update_habit_after_list_completed!(@habit_id, length_of_habit - @list_id - 1)
   session[:message] = 'List marked as complete.'
-  redirect "/lists/#{id}"
+  redirect "/habits/fractal/#{@habit_id}"
+end
+
+# Mark an existing task as completed
+post "/habits/:habit_id/list/:list_id/actions/:task_id" do |habit_id, list_id, task_id|
+  @habit_id = habit_id.to_i
+  @list_id = list_id.to_i
+  @list = get_task_list(@habit_id, @list_id)
+
+  task = @list[:todos][task_id.to_i]
+  task[:completed] = !!(params[:completed] == 'true')
+  session[:message] = 'The task has been updated'
+
+  redirect "/habits/#{habit_id}/list/#{@list_id}"
 end
 
 # Add an action to an existing list
-post "/lists/:list_id/actions" do |list_id|
+post "/habits/:habit_id/list/:list_id/actions" do |habit_id, list_id|
+  @habit_id = habit_id.to_i
   @list_id = list_id.to_i
-  @list = session[:lists][@list_id]
+  @list = get_task_list(@habit_id, @list_id)
   todo_text = params[:todo].strip
 
   error = error_for_todo(todo_text)
@@ -362,37 +427,13 @@ post "/lists/:list_id/actions" do |list_id|
   else
     @list[:todos] << { name: todo_text, completed: false }
     session[:message] = "The task has been added."  
-    redirect "/lists/#{@list_id}"
+    redirect "/habits/#{habit_id}/list/#{list_id}"
   end
 end
 
-# Mark an existing list as completed
-post "/lists/:list_id/actions/:task_id" do |list_id, task_id|
-  @list_id = list_id.to_i
-  @list = session[:lists][@list_id]
-  task = @list[:todos][task_id.to_i]
-  is_completed = !!(params[:completed] == 'true')
-  task[:completed] = is_completed
-  session[:message] = 'The task has been updated'
-  redirect "/lists/#{list_id}"
-end
-
 # Delete existing task
-post "/lists/:list_id/actions/:task_id/delete" do
-  list_id = params[:list_id].to_i
-  task_id = params[:task_id].to_i
-
-  session[:lists][list_id][:todos].delete_at(task_id)
+post "/habits/:habit_id/list/:list_id/actions/:task_id/delete" do |habit_id, list_id, task_id|
+  get_task_list(habit_id.to_i, list_id.to_i)[:todos].delete_at(task_id.to_i)
   session[:message] = "The task has been deleted."
-  redirect "/lists/#{list_id}"
+  redirect "/habits/#{habit_id}/list/#{list_id}"
 end
-
-
-
-
-
-
-
-
-
-
