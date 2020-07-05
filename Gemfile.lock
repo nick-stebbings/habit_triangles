@@ -2,20 +2,9 @@ GEM
   remote: https://rubygems.org/
   specs:
     ansi (1.5.0)
-    ast (2.4.0)
-    backport (1.1.2)
     backports (3.17.1)
-    benchmark (0.1.0)
     builder (3.2.4)
-    childprocess (3.0.0)
-    coderay (1.1.2)
-    e2mmap (0.1.0)
     erubis (2.7.0)
-    ffi (1.11.3)
-    jaro_winkler (1.5.4)
-    maruku (0.7.3)
-    method_source (1.0.0)
-    mini_portile2 (2.4.0)
     minitest (5.14.0)
     minitest-reporters (1.4.2)
       ansi
@@ -25,41 +14,17 @@ GEM
     multi_json (1.14.1)
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
-    nokogiri (1.10.9)
-      mini_portile2 (~> 2.4.0)
-    parallel (1.19.1)
-    parser (2.7.1.2)
-      ast (~> 2.4.0)
-    pry (0.13.1)
-      coderay (~> 1.1)
-      method_source (~> 1.0)
-    pry-remote (0.1.8)
-      pry (~> 0.9)
-      slop (~> 3.0)
+    nio4r (2.5.2)
+    puma (4.3.5)
+      nio4r (~> 2.0)
     rack (2.2.2)
     rack-protection (2.0.8.1)
       rack
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
-    rainbow (3.0.0)
     redcarpet (3.5.0)
-    reverse_markdown (1.4.0)
-      nokogiri
-    rexml (3.2.4)
-    rubocop (0.82.0)
-      jaro_winkler (~> 1.5.1)
-      parallel (~> 1.10)
-      parser (>= 2.7.0.1)
-      rainbow (>= 2.2.2, < 4.0)
-      rexml
-      ruby-progressbar (~> 1.7)
-      unicode-display_width (>= 1.4.0, < 2.0)
     ruby-progressbar (1.10.1)
     ruby2_keywords (0.0.2)
-    seeing_is_believing (4.0.0)
-      childprocess (~> 3.0.0)
-      ffi (~> 1.11.1)
-      parser (~> 2.7.0)
     sinatra (2.0.8.1)
       mustermann (~> 1.0)
       rack (~> 2.0)
@@ -72,25 +37,7 @@ GEM
       rack-protection (= 2.0.8.1)
       sinatra (= 2.0.8.1)
       tilt (~> 2.0)
-    slop (3.6.0)
-    solargraph (0.39.7)
-      backport (~> 1.1)
-      benchmark
-      bundler (>= 1.17.2)
-      e2mmap
-      jaro_winkler (~> 1.5)
-      maruku (~> 0.7, >= 0.7.3)
-      nokogiri (~> 1.9, >= 1.9.1)
-      parser (~> 2.3)
-      reverse_markdown (~> 1.0, >= 1.0.5)
-      rubocop (~> 0.52)
-      thor (~> 1.0)
-      tilt (~> 2.0)
-      yard (~> 0.9, >= 0.9.24)
-    thor (1.0.1)
     tilt (2.0.10)
-    unicode-display_width (1.7.0)
-    yard (0.9.25)
 
 PLATFORMS
   ruby
@@ -99,14 +46,11 @@ DEPENDENCIES
   erubis
   minitest
   minitest-reporters
-  pry
-  pry-remote
+  puma
   rack-test
   redcarpet
-  seeing_is_believing
   sinatra
   sinatra-contrib
-  solargraph
 
 RUBY VERSION
    ruby 2.4.10p364

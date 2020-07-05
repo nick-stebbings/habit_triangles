@@ -1,6 +1,6 @@
 require 'bundler/setup'
 require 'sinatra'
-require 'sinatra/reloader'
+require 'sinatra/reloader' if development?
 require 'tilt/erubis'
 require 'redcarpet'
 require 'yaml'
@@ -9,7 +9,7 @@ require 'uri'
 require_relative 'lib/habit'
 require_relative 'lib/objective'
 
-require 'pry-remote'
+# require 'pry-remote'
 
 ROOT = File.expand_path('..', __FILE__)
 TEXT = YAML.load_file(ROOT + '/public/paragraphs_text.yaml')
@@ -359,7 +359,6 @@ post /\/habits\/fractal((\/(?:\d{1,})){1,})/ do
   @habit = @habits.first
   day_toggle_switch_value = ("completed-day-" + params[:node_completed_index])
   habit_node_for_day = @habit.get_nth(params[:node_completed_index].to_i)
-  binding.pry
   habit_node_for_day.today = params.key?(day_toggle_switch_value) ? 't' : 'f'
   redirect "/habits/fractal/#{@habit.id}"
 end

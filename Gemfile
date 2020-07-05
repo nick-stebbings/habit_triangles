@@ -10,7 +10,11 @@ gem 'minitest-reporters'
 gem 'rack-test'
 gem 'redcarpet'
 
-gem 'solargraph'
-gem 'seeing_is_believing'
-gem 'pry'
-gem 'pry-remote'
+# gem 'solargraph'
+# gem 'seeing_is_believing'
+# gem 'pry'
+# gem 'pry-remote'
+
+group :production do
+  gem 'puma'
+end 
