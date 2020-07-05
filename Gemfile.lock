@@ -22,6 +22,7 @@ GEM
       rack
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
+    rake (13.0.1)
     redcarpet (3.5.0)
     ruby-progressbar (1.10.1)
     ruby2_keywords (0.0.2)
@@ -48,6 +49,7 @@ DEPENDENCIES
   minitest-reporters
   puma
   rack-test
+  rake
   redcarpet
   sinatra
   sinatra-contrib
