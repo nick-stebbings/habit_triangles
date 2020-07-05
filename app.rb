@@ -82,7 +82,7 @@ configure do
   enable :sessions
   set :session_secret, 'habit'
   set :erb, :escape_html => true
-  also_reload "paragraphs_text.yaml"
+  also_reload "paragraphs_text.yaml" if development?
 end
 
 def get_habit(id)
