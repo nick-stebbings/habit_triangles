@@ -55,7 +55,14 @@ a {
 	color: #16a085;
 }
 
+[role="action-list"] .input-group h2 {
+	font-size: 1.4rem;
+	margin: 5px 0 0 0;
+	padding: 0 10px;
+}
+
 .card dt,
+[role="action-list"] .input-group h2,
 a:hover {
 	color: #001;
 }
@@ -74,7 +81,6 @@ p.card-text + ul {
 
 /*Accordion headers */
 .card h3 { font-size: 1.8rem; }
-[role="action-list"] h2 {font-size: 1.4rem; }
 
 /* Dark background elements */
 
@@ -265,9 +271,9 @@ dl.h-flex.side-by-side > dd {
 }
 
 /* Arrows */
-#fractal span.triangle,
+.swiper-btn-next-0,
 .swiper-btn-prev-0,
-.swiper-btn-next-0 {
+#fractal span.triangle {
 	background: transparent;
 }
 
@@ -391,8 +397,28 @@ dl.h-flex.side-by-side > dd {
 	left: -9999px;
 }
 
-[role="action-list"] label {
-	border: 1px solid gray;
-	width: 50px;
-	height: 50px;
+[role="action-list"] form.check button[type="submit"] {
+	position: absolute;
+	left: -9999px;
 }
+
+[role="action-list"] .todo-icon {
+	position: relative;
+	left: 6px;
+	bottom: 20px;
+}
+
+[role="action-list"] label {
+	position: relative;
+	right: 30px;
+	border: 2px solid #16a085;
+	top: 8px;
+	width: 40px;
+	height: 40px;
+}
+
+[role="action-list"] .input-group {
+	margin-bottom: 10px;
+	padding: 0;
+}
+

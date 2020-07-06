@@ -13,7 +13,7 @@ gem 'redcarpet'
 
 # gem 'solargraph'
 # gem 'seeing_is_believing'
-# gem 'pry'
+gem 'pry'
 # gem 'pry-remote'
 
 group :production do

@@ -5,11 +5,10 @@ require 'tilt/erubis'
 require 'redcarpet'
 require 'yaml'
 require 'uri'
+require 'pry' if development?
 
 require_relative 'lib/habit'
 require_relative 'lib/objective'
-
-require 'pry'
 
 ROOT = File.expand_path('..', __FILE__)
 TEXT = YAML.load_file(ROOT + '/public/paragraphs_text.yaml')
@@ -383,6 +382,8 @@ get "/habits/:habit_id/list/:list_id" do |habit_id, list_id|
   @list_id = list_id.to_i
   @name = get_habit(habit_id.to_i).name
   @list = get_task_list(@habit_id, @list_id)
+
+  @intro_spiel = render_markdown( TEXT[:action_list][:intro] )
   
   erb :list, :layout => :list_layout
 end
@@ -407,12 +408,14 @@ post "/habits/:habit_id/list/:list_id/actions/:task_id" do |habit_id, list_id, t
   @habit_id = habit_id.to_i
   @list_id = list_id.to_i
   @list = get_task_list(@habit_id, @list_id)
-
   task = @list[:todos][task_id.to_i]
-  task[:completed] = !!(params[:completed] == 'true')
-  session[:message] = 'The task has been updated'
 
-  redirect "/habits/#{habit_id}/list/#{@list_id}"
+  task[:completed] = !task[:completed]
+  
+  unless env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
+    session[:message] = 'The task has been updated'
+    redirect "/habits/#{habit_id}/list/#{@list_id}"
+  end
 end
 
 # Add an action to an existing list

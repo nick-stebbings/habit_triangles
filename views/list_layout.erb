@@ -32,7 +32,7 @@
       <div class="col">
         <div class="jumbotron m-auto">
           <h1 class="text-center"><%= @page_title %></h1>
-          
+          <%== in_paragraphs(@intro_spiel) %>
           <% if session[:message] %>
           <div class="alert alert-warning" role="alert">
             <%= session.delete(:message) %>

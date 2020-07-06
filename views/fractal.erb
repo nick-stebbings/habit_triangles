@@ -31,13 +31,17 @@
           <% end %>
   </div>
   <!-- Add Arrows -->
-  <div class="swiper-button-next"></div>
-  <div class="swiper-button-prev"></div>
-  <div class="swiper-pagination"></div>
+  <div class="swiper-button-next fui-arrow-right"></div>
+  <div class="swiper-button-prev fui-arrow-left"></div>
+
+  <div class="swiper-pagination-wrapper">
+    <div class="swiper-pagination"></div>
+  </div>
+
                           <% @habits.each_with_index do |habit, habit_idx| %>
                           <% if habit_idx.zero? then next end %>
-      <div class="swiper-container">
-        <div class="swiper-wrapper">
+                            <div class="swiper-container">
+                              <div class="swiper-wrapper">
                               <% node_idx = 0 %>
                               <% habit.each do |node| %>
                               <!-- We need the slides for the pagination triangles, each slide with data-name attribute   -->
@@ -47,14 +51,14 @@
                               <% node_idx += 1 %>
                               <% end %>
 
-        </div>
-        <!-- Add Arrows -->
-        <div class="swiper-button-next"></div>
-        <div class="swiper-button-prev"></div>
-        <div class="swiper-pagination-wrapper">
-          <div class="swiper-pagination"></div>
-        </div>
-      </div>
+                            </div>
+                            <!-- Add Arrows -->
+                            <div class="swiper-button-next hidden"></div>
+                            <div class="swiper-button-prev hidden"></div>
+                            <div class="swiper-pagination-wrapper">
+                              <div class="swiper-pagination"></div>
+                            </div>
+                          </div>
                           <% end %>
 </div>
 

@@ -2,12 +2,9 @@
   <header>
     <div class="input-group side-by-side">
       <div class="input-group-prepend"><span class="input-group-text">Habit Name:</span></div>
-      <%= @name.split("_").join(" ") %>
+      <h2><%= @name.split("_").join(" ") %></h2>
       <form action="/habits/<%= @habit_id %>/list/<%= @list_id %>/complete_all" method="post">
-        <button class="btn btn-primary" type="submit">Complete Habit for Today
-        </button>
-        <button class="btn btn-warning" type="submit"
-          formaction="/habits/<%= "#{@habit_id}" + completed_list_redirection(@habit_id, @list_id) %>">Save Progress
+        <button class="btn btn-primary btn-sm" type="submit">Complete Habit for Today
         </button>
       </form>
     </div>
@@ -36,10 +33,7 @@
       </li>
 
       <form action="/habits/<%= @habit_id %>/list/<%= @list_id %>/actions/<%= idx %>" method="post" class="check">
-        <input type="hidden" name="completed" value="<%= !task[:completed] %>" />
         <button class="complete_btn" type="submit" id="complete_btn_<%= idx %>">Complete</button>
-        <label for="complete_btn">
-        </label>
       </form>
       </li>
 

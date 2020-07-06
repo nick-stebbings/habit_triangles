@@ -16,8 +16,21 @@ $(function () {
     $(this).closest("form").submit();
   });
 
-  $(".todo").on("click", "li", function () {
+  $(".todo").on("click", "li", function (event) { // Atomic habit action list functionality
+    let checkboxInput = $(".check > input");
+    
     $(this).toggleClass("todo-done");
+
+    $(".check > input").val(!checkboxInput);
+    
+    let form = $("form.check");
+
+    $.ajax({
+      url: form.attr("action"),
+      method: form.attr("method"),
+    });
+
+    // Ajax request needed here? Or just change the list so that it submits all when you click save?
   });
 
   $("button.btn-danger").click(function (event) {
@@ -29,10 +42,33 @@ $(function () {
       this.submit();
     }
   });
+// PSEUDO CODE:
+// For the prev button
+// prevent swiping until base habit's arrow controller is pressed, then OnClick:
+//  - SET current_node to be the active slide of the base habit
+//  - FOREACH swiper
+//    - SET the habit_length var to be length of swiper's habit
+//    - CASE current_node 
+//        - WHEN == habit_length 
+//          - then toggle the active class for the last bullet element in pagination
+//        - WHEN  > habit length
+//          - then click the habit's prev button
+
+// For the next button
+// prevent swiping until base habit's arrow controller is pressed, then OnClick:
+//  - SET current_node to be the active slide of the base habit
+//  - FOREACH swiper
+//    - SET the habit_length var to be length of swiper's habit
+//    - CASE current_node 
+//        - WHEN == habit_length 
+//          - then toggle the active class for the last bullet element in pagination
+//        - WHEN  < habit length
+//          - then click the habit's prev button
+
 
   // Initializing the swiper plugin for the slider.
   // Read more here: http://idangero.us/swiper/api/
-    var swiperInstances = {};
+    // var swiperInstances = {};
   $(".swiper-container").each(function (index, element) {
     var $this = $(this);
     $this.addClass("instance-" + index);
@@ -50,7 +86,7 @@ $(function () {
     var swiper = new Swiper(".instance-" + index, {
       // your settings ...
       nextButton: ".swiper-btn-next-" + index,
-      prevButton: ".swiper-btn-prev-" + index,
+      prevButton: ".swiper-btn-prev-" + index ,
       paginationType: "bullets",
       paginationClickable: true,
       pagination: "#triangles-" + index,

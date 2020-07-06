@@ -14,6 +14,16 @@
 
   :old: Track the status of each of the sub-habits.
 
+:action_list:
+  :intro: >
+    Since you've labelled this habit as *atomic*, we can break it down into a few simple actions which you can check off each day.
+
+    Add items to the list - simple steps or 'things to remember' that will help you each day.
+
+    Tick off items and it will save it for you automatically.
+
+    Or, click 'Day Completed' to mark the habit as done for the day!
+
 :existing_habit:
   :new: >
     You've created a new habit to track, so you're well on the way to establishing some new behavior.
