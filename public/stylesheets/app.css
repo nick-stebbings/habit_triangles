@@ -223,14 +223,24 @@ dl.h-flex.side-by-side > dd {
 }
 
 /*--- Fractal Triangle Page */
+/* layout */
+#fractal .row:last-of-type {
+	height: 100%;
+}
+
+#fractal .card-header {
+	height: 90vh;
+}
+
 /* Headings */
 #fractal .card-header {
 	padding: 0;
 }
 
 #fractal .h-flex:first-child {
- margin: 0 auto;
- padding-left: 20%;
+ /* margin: 0 auto;
+ padding-left: 20%; */
+ 
 }
 
 /* Per-habit dashboard (sidebar)*/
@@ -238,11 +248,6 @@ dl.h-flex.side-by-side > dd {
 	grid-area: side;
   width: 18%;
 }
-/* #habit-dash-container > div:nth-of-type(2) { grid-area: side2; } */
-/* #habit-dash-container > div:nth-of-type(3) { grid-area: side3; } */
-
-.habit-dashboard-container { width: 18%;}
-.habit-dashboard { height: 30%;}
 
 #fractal .habit-buttons a {
 	color: white;
@@ -277,9 +282,6 @@ dl.h-flex.side-by-side > dd {
 	background: transparent;
 }
 
-.swiper-btn-prev-0 { grid-area: ba0;}
-.swiper-btn-next-0 { grid-area: fa0; }
-
 /* Habit triangles */
 #fractal span.triangle-success {
 	border-color: transparent transparent #2ecc71 transparent;
@@ -288,16 +290,27 @@ dl.h-flex.side-by-side > dd {
 	border-color: transparent transparent #f1c40f transparent;
 }
 #fractal span.triangle {
-	width: 0;
-	height: 0;
 	border-style: solid;
-	flex: 1;
-	border-width: 0 40px 69.28px 40px;
+	border-width: 0 14.434vh 25vh 14.434vh; /* Equilateral */
 	opacity: 1;
 	border-radius: 0;
 }
 
 /* Pagination text and alignment*/
+
+#triangles-0 {
+	margin-top: -4rem;
+}
+
+#triangles-1 {
+	margin-top: -2rem;
+}
+
+#fractal .triangle-wrapper {
+	flex: 1 1 auto;
+	width: 0;
+	height: 0;
+}
 #fractal span.triangle span {
 	position: relative;
 	right: 6px;
@@ -310,8 +323,13 @@ dl.h-flex.side-by-side > dd {
 .swiper-pagination-wrapper {
 	width: 100%;
 }
-.swiper-pagination {
-	display: flex;
+
+#fractal .h-flex {
+ margin: 0;
+ width: 55%;
+ flex-wrap: nowrap;
+ display: flex;
+
 }
 
 #fractal span.triangle.swiper-pagination-bullet-active span { color: #001; }
@@ -329,13 +347,15 @@ dl.h-flex.side-by-side > dd {
 	grid-template-columns: 20% 5% 70% 5%;
 	grid-template-rows: 50px 1fr 1fr 1fr;
 	grid-template-areas: "null0 null1 head null2"
-		"side  null3  top null4"
-		"side  ba0    mid   fa0"
-		"side null5   bot null6";
-		min-height: 400px;
-		width: 100%;
-		/* justify-items: baseline; */
+	"side  null3  top null4"
+	"side  ba0    mid   fa0"
+	"side null5   bot null6";
+	height: 100%;
+	width: 100%;
 }
+
+.swiper-btn-prev-0 { grid-area: ba0;}
+.swiper-btn-next-0 { grid-area: fa0; }
 
 .hidden {
 	display: none;
