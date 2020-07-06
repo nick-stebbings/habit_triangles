@@ -32,35 +32,47 @@ $(function () {
 
   // Initializing the swiper plugin for the slider.
   // Read more here: http://idangero.us/swiper/api/
-
-  var mySwiper = new Swiper(".swiper-container", {
-    grabCursor: true,
-    resistanceRatio: 0.2,
-    loopAdditionalSlides: 0,
-    cssMode: true,
-    pagination: ".pag-triangles",
-    bulletClass: "swiper-pagination-bullet",
-    currentClass: "swiper-pagination-current",
-    nextButton: ".swiper-button-next",
-    prevButton: ".swiper-button-prev",
-    paginationBulletRender: function (index, className) {
-      var currentSlide = $("." + this.wrapperClass).find(".swiper-slide")[
-        index
-      ];
-      var dayCompletedClass =
-        $(currentSlide).attr("data-name").slice(-1) == "t"
-          ? "success"
-          : "notyet";
-      var bulletStyles =
-        '<span class="' +
-        className +
-        " triangle triangle-" +
-        dayCompletedClass +
-        '">' +
-        $(currentSlide).attr("data-date") +
-        "</span>";
-      return bulletStyles;
-    },
-    paginationClickable: true,
+    var swiperInstances = {};
+  $(".swiper-container").each(function (index, element) {
+    var $this = $(this);
+    $this.addClass("instance-" + index);
+    // if (index > 0) { $this.addClass("hidden")};
+    $this.find(".swiper-pagination").slice(0,1).addClass("swiper-pagination-" + index);
+    $this.find(".swiper-pagination").slice(0,1).attr("id", "triangles-" + index);
+    $this
+      .find(".swiper-button-prev")
+      .slice(0, 1)
+      .addClass("swiper-btn-prev-" + index);
+    $this
+      .find(".swiper-button-next")
+      .slice(0, 1)
+      .addClass("swiper-btn-next-" + index);
+    var swiper = new Swiper(".instance-" + index, {
+      // your settings ...
+      nextButton: ".swiper-btn-next-" + index,
+      prevButton: ".swiper-btn-prev-" + index,
+      paginationType: "bullets",
+      paginationClickable: true,
+      pagination: "#triangles-" + index,
+      paginationBulletRender: function (index, className) {
+        var currentSlide = $("." + this.wrapperClass).find(".swiper-slide")[
+          index
+        ];
+        var dayCompletedClass =
+          $(currentSlide).attr("data-name").slice(-1) == "t"
+            ? "success"
+            : "notyet";
+        var bulletStyles =
+          '<span class="' +
+          className +
+          " triangle triangle-" +
+          dayCompletedClass +
+          '"><span>' +
+          $(currentSlide).attr("data-date") +
+          "</span></span>";
+        return bulletStyles;
+      },
+    });
   });
+  
 });

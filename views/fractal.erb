@@ -22,45 +22,42 @@
         <%== @sub_info  %>
       </div>
 
-
 <div class="swiper-container">
   <div class="swiper-wrapper">
-      <form class="toggle_completed_day" action="/habits/fractal/<%= "#{@habits.first.id}" %>" method="post">
-        <!-- Hidden element will pass the index of the slide to the backend for persistence -->
-        <input type="hidden" name="node_completed_index" value="" id="node-completed-index" />
           <% @base_habit.each_with_index do |node, idx| %>
-          <%= p idx %>
           <% @date_today = @reference_date + (@length_of_longest_habit - idx - 1) %>
-          <div class="swiper-slide" data-name="<%= "#{idx}-day-#{node.today}" %>"
-            data-date="<%= "<span>#{@date_today.strftime '%d'}</span>" %>"></div>
+          <div class="swiper-slide" data-name="<%= "0-#{idx}-day-#{node.today}" %>"
+            data-date="<%= "#{@date_today.strftime '%d'}" %>"></div>
           <% end %>
-      </form>
   </div>
   <!-- Add Arrows -->
   <div class="swiper-button-next"></div>
   <div class="swiper-button-prev"></div>
   <div class="swiper-pagination"></div>
-
-                          <!-- Skipping the base habit -->
-                          <!-- For each remaining habit in the collection -->
                           <% @habits.each_with_index do |habit, habit_idx| %>
                           <% if habit_idx.zero? then next end %>
-                          <div class="swiper-container">
-                            <div class="swiper-wrapper">
+      <div class="swiper-container">
+        <div class="swiper-wrapper">
                               <% node_idx = 0 %>
                               <% habit.each do |node| %>
                               <!-- We need the slides for the pagination triangles, each slide with data-name attribute   -->
                               <% @date_of_completion = habit.date_of_initiation + (habit.length - node_idx - 1) %>
                               <div class="swiper-slide" data-name="<%== "#{habit_idx}-#{node_idx}-day-#{node.today}" %>"
-                                data-date="<%== "<span>#{@date_of_completion.strftime '%d'}</span>" %>">1</div>
+                                data-date="<%== "#{@date_of_completion.strftime '%d'}" %>">&nbsp;</div>
                               <% node_idx += 1 %>
                               <% end %>
-                            </div>
-                            <div class="swiper-button-prev"></div>
-                            <div class="swiper-button-next"></div>
-                            <div class="swiper-pagination"></div>
-                          </div>
+
+        </div>
+        <!-- Add Arrows -->
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-pagination-wrapper">
+          <div class="swiper-pagination"></div>
+        </div>
+      </div>
                           <% end %>
+</div>
+
 
     </div>
   </div>

@@ -216,72 +216,71 @@ dl.h-flex.side-by-side > dd {
   flex: 1;
 }
 
-/* Fractal Triangle Page */
+/*--- Fractal Triangle Page */
+/* Headings */
 #fractal .card-header {
 	padding: 0;
 }
 
-.habit-list dt p {
+#fractal .h-flex:first-child {
+ margin: 0 auto;
+ padding-left: 20%;
+}
+
+/* Per-habit dashboard (sidebar)*/
+#habit-dash-container { 
+	grid-area: side;
+  width: 18%;
+}
+/* #habit-dash-container > div:nth-of-type(2) { grid-area: side2; } */
+/* #habit-dash-container > div:nth-of-type(3) { grid-area: side3; } */
+
+.habit-dashboard-container { width: 18%;}
+.habit-dashboard { height: 30%;}
+
+#fractal .habit-buttons a {
+	color: white;
 	width: 50%;
 }
 
-#fractal .h-flex {
-	margin: 0 auto;
-	padding-left: 20%;
-}
-
-#fractal dd.habit-tracked-toggle {
-	margin: 0 0 50px;
-}
-
-.habit-list.v-flex {
-	width: 20%;
-	height: 100%;
-	padding-bottom: 40px; /* Pagination height */
-	box-sizing: border-box;
-	justify-content: flex-end;
-}
-
-.habit-list dt p {
+.habit-list div p {
 	margin-bottom: 0;
 	font-size: 0.8rem;
 	text-align: center;
+}
+
+#fractal div.habit-dashboard > div > p {
+	display: inline;
+	margin: 0;
+	font-size: 0.7rem;
 }
 
 #fractal .bootstrap-switch-square {
 	margin: 0;
 }
 
-/* Swiper  */
+/*-- Swiper  */
 
 .swiper-slide {
-	min-height: 200px;
 }
 
 /* Arrows */
 #fractal span.triangle,
-.swiper-button-prev,
-.swiper-button-next {
+.swiper-btn-prev-0,
+.swiper-btn-next-0 {
 	background: transparent;
 }
-.swiper-button-next,
-.swiper-button-prev {
-	position: absolute;
-	top: 34%;
-}
-.swiper-button-prev { left: 21% }
-.swiper-button-next { right: -5px }
+
+.swiper-btn-prev-0 { grid-area: ba0;}
+.swiper-btn-next-0 { grid-area: fa0; }
 
 /* Habit triangles */
-
 #fractal span.triangle-success {
 	border-color: transparent transparent #2ecc71 transparent;
 }
-
 #fractal span.triangle-notyet {
 	border-color: transparent transparent #f1c40f transparent;
 }
-
 #fractal span.triangle {
 	width: 0;
 	height: 0;
@@ -292,6 +291,7 @@ dl.h-flex.side-by-side > dd {
 	border-radius: 0;
 }
 
+/* Pagination text and alignment*/
 #fractal span.triangle span {
 	position: relative;
 	right: 6px;
@@ -301,15 +301,79 @@ dl.h-flex.side-by-side > dd {
 	font-size: 1.3rem;
 }
 
-.swiper-pagination.pag-triangles {
-	width: 78%;
+.swiper-pagination-wrapper {
+	width: 100%;
+}
+.swiper-pagination {
 	display: flex;
-	margin-left: 22%;
-	flex-wrap: nowrap;
-	justify-content: center;
 }
 
 #fractal span.triangle.swiper-pagination-bullet-active span { color: #001; }
+
+/* Swiper grid */
+
+.swiper-container {
+	display: grid;
+	position: static;
+	bottom: unset;
+	left: unset;
+	position: absolute;
+}
+.swiper-container.instance-0 {
+	grid-template-columns: 20% 5% 70% 5%;
+	grid-template-rows: 50px 1fr 1fr 1fr;
+	grid-template-areas: "null0 null1 head null2"
+		"side  null3  top null4"
+		"side  ba0    mid   fa0"
+		"side null5   bot null6";
+		min-height: 400px;
+		width: 100%;
+		/* justify-items: baseline; */
+}
+
+.hidden {
+	display: none;
+}
+
+#fractal .habit-dashboard-container {
+	grid-area: side;
+}
+
+.swiper-container.instance-0 .swiper-pagination-wrapper {
+	grid-area: bot;
+}
+
+.swiper-container.instance-1 .swiper-pagination-wrapper {
+	grid-area: mid;
+}
+
+.swiper-container.instance-2 .swiper-pagination-wrapper {
+	grid-area: top;
+}
+
+.swiper-pagination-wrapper,
+.swiper-container.instance-2,
+.swiper-container.instance-1 {
+	display: grid;
+	grid-template-columns: subgrid;
+	grid-template-rows: subgrid;
+}
+
+/* 
+.habit-identifier {
+	position: absolute;
+	left: 20%;
+} */
+
+.habit-buttons.h-flex {
+	margin: 0;
+}
+
+.habit-buttons > dd,
+.habit-buttons > dt,
+.habit-buttons > button {
+	flex: 0 1 42%m;
+}
 
 /* Action list for atomic habits */
 [role="action-list"] .card-body {
