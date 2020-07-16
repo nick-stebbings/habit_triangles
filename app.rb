@@ -350,6 +350,7 @@ get /\/habits\/fractal((\/(?:\d{1,})){1,})/ do
   @intro_spiel = render_markdown(params[:initial] ? TEXT[:existing_habit][:new] : TEXT[:existing_habit][:old])
   @page_title = "Fractal Habit Triangle"
   @reference_date = @habits.max_by { |h| h.length }.date_of_initiation
+  # binding.pry
   erb :fractal
 end
 

@@ -1,9 +1,49 @@
 // app.js
+var swiperInstances = [];
+
 $(function () {
+  // Waits for an event to fully elapse before callback is executed
+  const waitForFinalEvent = (function () {
+    var timers = {};
+    return function (callback, ms, uniqueId) {
+      if (!uniqueId) {
+        uniqueId = "Don't call this twice without a uniqueId";
+      }
+      if (timers[uniqueId]) {
+        clearTimeout(timers[uniqueId]);
+      }
+      timers[uniqueId] = setTimeout(callback, ms);
+    };
+  })();
+  // Adds class names to distinguish flex-rows from each other
+  const wrapped = function () {
+    var offset_top_prev;
+
+    $(".triangle-wrapper").each(function () {
+      var offset_top = $(this).offset().top;
+
+      if (offset_top > offset_top_prev) {
+        $(this).addClass("wrapped");
+        $(this).before("<div class='flex-break'></div>");
+      } else if (offset_top == offset_top_prev) {
+        $(this).removeClass("wrapped");
+      }
+      offset_top_prev = offset_top;
+    });
+    for (let i = 0; i < swiperInstances.length; i++) {
+      addFlexRowDivsAndClasses(i);
+    }
+  };
+
+  // Performs all functions needed to arrange flex-rows into pyramid
+  const formatPyramid = function () {
+    // After the window resize has definitely finished
+    // Add classnames to wrapped elements, add flex-break divs between flex-rows
+    waitForFinalEvent(wrapped, 50, "window-resize");
+    formatTriangles(swiperInstances[0].slides.length);
+  };
   // Initializing the swiper plugin for the slider.
   // Read more here: http://idangero.us/swiper/api/
-  var swiperInstances = [];
-
   $(".swiper-container").each(function (index, element) {
     var $this = $(this);
     $this.addClass("instance-" + index);
@@ -53,6 +93,49 @@ $(function () {
     });
     swiperInstances.push(newSwiper);
   });
+
+  function formatTriangles(numTriangles, triangleScale = 12) {
+    let rowWidth = Math.min.apply(0, [numTriangles, 9]);
+    if (rowWidth < numTriangles) {
+      let oddTrianglesSelector =
+        "#fractal .triangle-wrapper:nth-of-type(2n + 2) span.triangle";
+      $("#fractal span.triangle-wrapper").addClass("tessellated");
+      $(oddTrianglesSelector).css("border-width", "5em 2.8em 0em 2.8em");
+      $(oddTrianglesSelector).css(
+        "border-color",
+        "#2ecc71 transparent transparent transparent"
+      );
+      let ninthTrianglesSelector =
+        "#fractal .triangle-wrapper:nth-of-type(15n)";
+      $(ninthTrianglesSelector).append("<div class='flex-break'></div>");
+      let triangleWidth = triangleScale * (1 / rowWidth).toFixed(3);
+      $("#fractal .swiper-pagination").css("font-size", `${triangleWidth}vh`);
+    }
+  }
+  // Add class identifiers to each element wrapped onto
+  // the next flex row. Rows are zero indexed from most recent day to oldest day
+  function addFlexRowDivsAndClasses(swiperId) {
+    let flexBreaks = $("[class*='flex-break']").length - 1;
+    console.log($(`#triangles-${swiperId} div.flex-break`));
+    let numRows = flexBreaks;
+
+    // Add classes to the span elements in each row
+    let pagTriangles = $(`#triangles-${swiperId}`).children();
+    pagTriangles.each(function (idx, value) {
+      if ($(this).attr("class").includes("flex-break")) {
+        flexBreaks--;
+      }
+      $(this).addClass(`flex-row-${flexBreaks}`);
+    });
+
+    // Wrap all spans with their row-classes in a container div for the row
+    for (let rowNum = 0; rowNum <= numRows; rowNum++) {
+      $(`#triangles-${swiperId} .flex-row-${rowNum}`).wrapAll(
+        '<div class="custom-flex-row"></div>'
+      );
+    }
+    // $(".swiper-pagination").css("flex-direction", "column");
+  }
 
   /* FlatUI switches on fractal page */
   $('[data-toggle="switch"]').bootstrapSwitch();
@@ -116,46 +199,35 @@ $(function () {
     customButtonEvents
   );
 
-  function getSwiperInstanceSlides(swiperId) {
-    return $(".swiper-wrapper")
-      .children(".swiper-slide")
-      .filter((idx, slide) => $(slide).data("name")[0] === swiperId.toString());
-  }
+  // function getSwiperInstanceSlides(swiperId) {
+  //   return $(".swiper-wrapper")
+  //     .children(".swiper-slide")
+  //     .filter((idx, slide) => $(slide).data("name")[0] === swiperId.toString());
+  // }
 
-  function getActivePaginationTriangle(swiperId) {
-    return $("#triangles-" + swiperId + " .triangle-wrapper")
-      .children(".triangle")
-      .filter((idx, slide) =>
-        $(slide).hasClass("swiper-pagination-bullet-active")
-      );
-  }
+  // function getActivePaginationTriangle(swiperId) {
+  //   return $("#triangles-" + swiperId + " .triangle-wrapper")
+  //     .children(".triangle")
+  //     .filter((idx, slide) =>
+  //       $(slide).hasClass("swiper-pagination-bullet-active")
+  //     );
+  // }
 
   // Using this function to change display of the remaining (shorter) habits when the prev button is clicked
   function customButtonEvents(event) {
     let swiperId = event.data.swiperId;
     var btnClass = `.swiper-btn-${event.data.direction}-${swiperId}`;
-    let baseSwiperSlides = getSwiperInstanceSlides(0);
-    var baseHabitCurrentDay;
+    var baseHabitCurrentDay = swiperInstances[0].activeIndex;
 
-    let swiperSlides = getSwiperInstanceSlides(swiperId);
+    let swiperSlides = swiperInstances[swiperId].slides;
     let habitLength = swiperSlides.length;
     console.log(habitLength, swiperId);
 
-    // Get index of active day (from base habit's swiper slides)
-    for (let index = 0; index < baseSwiperSlides.length; index++) {
-      let currentBaseSlide = baseSwiperSlides[index];
-
-      if ($(currentBaseSlide).hasClass("swiper-slide-active")) {
-        baseHabitCurrentDay = index;
-        console.log(baseHabitCurrentDay);
-        break;
-      }
-    }
     if (event.data.direction === "next") {
       switch (true) {
         case baseHabitCurrentDay == habitLength + 1:
           console.log(getActivePaginationTriangle(swiperId));
-          
+
           getActivePaginationTriangle(swiperId).toggleClass(
             "swiper-pagination-bullet-active"
           );
@@ -174,7 +246,7 @@ $(function () {
           $(swiperSlides.slice(-1)).toggleClass(
             "swiper-pagination-bullet-active"
           );
-          console.log("slide:", swiperSlides[habitLength-1]);
+          console.log("slide:", swiperSlides[habitLength - 1]);
           break;
         case baseHabitCurrentDay <= habitLength:
           $(btnClass).click();
@@ -186,6 +258,8 @@ $(function () {
     }
   }
 
+  $(window).resize(formatPyramid);
+  formatPyramid();
   // PSEUDO CODE:
   // For the prev button
   // prevent swiping until base habit's arrow controller is pressed, then OnClick:

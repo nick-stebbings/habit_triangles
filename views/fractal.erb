@@ -12,7 +12,7 @@
 
     <div class="card">
       <div class="card-header">
-      
+
         <!-- Display warnings and success messages -->
         <% if session[:message] %>
         <div class="flash">
@@ -20,50 +20,51 @@
         </div>
         <% end %>
         <%== @sub_info  %>
+
+        <div class="swiper-container">
+          <div class="swiper-wrapper">
+            <% @base_habit.each_with_index do |node, idx| %>
+            <% @date_today = @reference_date + (@length_of_longest_habit - idx - 1) %>
+            <div class="swiper-slide" data-name="<%= "0-#{idx}-day-#{node.today}" %>"
+              data-date="<%= "#{@date_today.strftime '%d'}" %>"></div>
+            <% end %>
+          </div>
+          <!-- Add Arrows -->
+          <div class="swiper-button-next fui-arrow-right"></div>
+          <div class="swiper-button-prev fui-arrow-left"></div>
+
+          <div class="swiper-pagination-wrapper">
+            <div class="swiper-pagination h-flex"></div>
+          </div>
+
+          <% @habits.each_with_index do |habit, habit_idx| %>
+          <% if habit_idx.zero? then next end %>
+          <div class="swiper-container">
+            <div class="swiper-wrapper">
+              <% node_idx = 0 %>
+              <% habit.each do |node| %>
+              <!-- We need the slides for the pagination triangles, each slide with data-name attribute   -->
+              <% @date_of_completion = habit.date_of_initiation + (habit.length - node_idx - 1) %>
+              <div class="swiper-slide" data-name="<%== "#{habit_idx}-#{node_idx}-day-#{node.today}" %>"
+                data-date="<%== "#{@date_of_completion.strftime '%d'}" %>">&nbsp;</div>
+              <% node_idx += 1 %>
+              <% end %>
+
+            </div>
+            <!-- Add Arrows -->
+            <div class="swiper-button-next hidden"></div>
+            <div class="swiper-button-prev hidden"></div>
+            <div class="swiper-pagination-wrapper">
+              <div class="swiper-pagination h-flex">
+                <div class="flex-row"></div>
+              </div>
+            </div>
+            <% end %>
+          </div>
+        </div>
+
+
       </div>
-
-<div class="swiper-container">
-  <div class="swiper-wrapper">
-          <% @base_habit.each_with_index do |node, idx| %>
-          <% @date_today = @reference_date + (@length_of_longest_habit - idx - 1) %>
-          <div class="swiper-slide" data-name="<%= "0-#{idx}-day-#{node.today}" %>"
-            data-date="<%= "#{@date_today.strftime '%d'}" %>"></div>
-          <% end %>
-  </div>
-  <!-- Add Arrows -->
-  <div class="swiper-button-next fui-arrow-right"></div>
-  <div class="swiper-button-prev fui-arrow-left"></div>
-
-  <div class="swiper-pagination-wrapper">
-    <div class="swiper-pagination h-flex"></div>
-  </div>
-
-                          <% @habits.each_with_index do |habit, habit_idx| %>
-                          <% if habit_idx.zero? then next end %>
-                            <div class="swiper-container">
-                              <div class="swiper-wrapper">
-                              <% node_idx = 0 %>
-                              <% habit.each do |node| %>
-                              <!-- We need the slides for the pagination triangles, each slide with data-name attribute   -->
-                              <% @date_of_completion = habit.date_of_initiation + (habit.length - node_idx - 1) %>
-                              <div class="swiper-slide" data-name="<%== "#{habit_idx}-#{node_idx}-day-#{node.today}" %>"
-                                data-date="<%== "#{@date_of_completion.strftime '%d'}" %>">&nbsp;</div>
-                              <% node_idx += 1 %>
-                              <% end %>
-
-                            </div>
-                            <!-- Add Arrows -->
-                            <div class="swiper-button-next hidden"></div>
-                            <div class="swiper-button-prev hidden"></div>
-                            <div class="swiper-pagination-wrapper">
-                              <div class="swiper-pagination h-flex"></div>
-                            </div>
-                          </div>
-                          <% end %>
-</div>
-
-
     </div>
-  </div>
 
-</div>
+  </div>
