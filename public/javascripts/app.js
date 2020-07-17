@@ -15,7 +15,7 @@ $(function () {
       timers[uniqueId] = setTimeout(callback, ms);
     };
   })();
-  // Adds class names to distinguish flex-rows from each other
+  // Adds flex-break divs to break up triangles into flex-row containers
   const wrapped = function () {
     var offset_top_prev;
 
@@ -23,29 +23,35 @@ $(function () {
       var offset_top = $(this).offset().top;
 
       if (offset_top > offset_top_prev) {
-        $(this).addClass("wrapped");
+        // If the triangle moved due to flex wrapping...
+        // Add a flex-break element before the first triangle of each line
         $(this).before("<div class='flex-break'></div>");
-      } else if (offset_top == offset_top_prev) {
-        $(this).removeClass("wrapped");
       }
       offset_top_prev = offset_top;
     });
+  };
+
+  const addFlexRowsForAllHabits = function () {
+    // Use our flex-breaks to delineate custom flex-rows for each habit instance
     for (let i = 0; i < swiperInstances.length; i++) {
-      addFlexRowDivsAndClasses(i);
+      addFlexRowClasses(i);
     }
   };
 
-  // Performs all functions needed to arrange flex-rows into pyramid
+  // Perform all functions needed to arrange flex-rows into pyramid
   const formatPyramid = function () {
-    // After the window resize has definitely finished
-    // Add classnames to wrapped elements, add flex-break divs between flex-rows
-    waitForFinalEvent(wrapped, 50, "window-resize");
+    // After the window resize has definitely finished, perform pyramid alignment
+    // Dynamically resize triangles and turn them upside down to tessellate
     formatTriangles(swiperInstances[0].slides.length);
+    waitForFinalEvent(wrapped, 0, "window-resize");
+    addFlexRowsForAllHabits();
   };
-  // Initializing the swiper plugin for the slider.
-  // Read more here: http://idangero.us/swiper/api/
+
+  // Initialise swipers for each habit
+  // (habit IDs were already passed and habit swiper markup included in fractal template)
   $(".swiper-container").each(function (index, element) {
     var $this = $(this);
+    // Create distinctly numbered classes for swiper elements of each swiper instance
     $this.addClass("instance-" + index);
     $this
       .find(".swiper-pagination")
@@ -71,7 +77,7 @@ $(function () {
       paginationType: "bullets",
       paginationClickable: true,
       pagination: "#triangles-" + index,
-      // Custom pagination rendering for Triangles
+      // Custom pagination rendering for triangles interface
       paginationBulletRender: function (index, className) {
         var currentSlide = $("." + this.wrapperClass).find(".swiper-slide")[
           index
@@ -94,51 +100,62 @@ $(function () {
     swiperInstances.push(newSwiper);
   });
 
-  function formatTriangles(numTriangles, triangleScale = 12) {
-    let rowWidth = Math.min.apply(0, [numTriangles, 9]);
-    if (rowWidth < numTriangles) {
+  function formatTriangles(totalTriangles, triangleScale = 12, rowBreak = 9) {
+    // If habit is less than rowBreak days old, let rows be that wide
+    // Otherwise triangles wrap after rowBreak days
+    let rowWidth = Math.min(totalTriangles, rowBreak);
+
+    if (rowWidth < totalTriangles) {
       let oddTrianglesSelector =
         "#fractal .triangle-wrapper:nth-of-type(2n + 2) span.triangle";
+      let rowBreakTriangleSelector = `#fractal .triangle-wrapper:nth-of-type(${
+        2 * rowWidth
+      })`;
+
       $("#fractal span.triangle-wrapper").addClass("tessellated");
       $(oddTrianglesSelector).css("border-width", "5em 2.8em 0em 2.8em");
       $(oddTrianglesSelector).css(
         "border-color",
         "#2ecc71 transparent transparent transparent"
       );
-      let ninthTrianglesSelector =
-        "#fractal .triangle-wrapper:nth-of-type(15n)";
-      $(ninthTrianglesSelector).append("<div class='flex-break'></div>");
+      $(rowBreakTriangleSelector).after("<div class='flex-break'></div>");
+
+      // Scale the triangles based upon scale argument and row width
       let triangleWidth = triangleScale * (1 / rowWidth).toFixed(3);
       $("#fractal .swiper-pagination").css("font-size", `${triangleWidth}vh`);
+      // addFlexRowClasses();
     }
   }
-  // Add class identifiers to each element wrapped onto
-  // the next flex row. Rows are zero indexed from most recent day to oldest day
-  function addFlexRowDivsAndClasses(swiperId) {
-    let flexBreaks = $("[class*='flex-break']").length - 1;
-    console.log($(`#triangles-${swiperId} div.flex-break`));
-    let numRows = flexBreaks;
+
+  // Add class identifiers to each element that was wrapped onto the next flex row.
+  // custom-flex-rows are zero indexed from most recent habit day to the oldest habit day
+  const addFlexRowClasses = function (swiperId) {
+    let flexBreakIndex = Math.max($("[class*='flex-break']").length - 1, 0);
+    let numRows = flexBreakIndex;
 
     // Add classes to the span elements in each row
     let pagTriangles = $(`#triangles-${swiperId}`).children();
     pagTriangles.each(function (idx, value) {
       if ($(this).attr("class").includes("flex-break")) {
-        flexBreaks--;
+        flexBreakIndex--;
       }
-      $(this).addClass(`flex-row-${flexBreaks}`);
+      $(this).addClass(`flex-row-${flexBreakIndex}`);
     });
+    wrapFlexRows(numRows, swiperId);
+  };
 
-    // Wrap all spans with their row-classes in a container div for the row
+  // Wrap all (spans with the same row-classes) in a container div for the row
+  const wrapFlexRows = function (numRows, swiperId) {
     for (let rowNum = 0; rowNum <= numRows; rowNum++) {
       $(`#triangles-${swiperId} .flex-row-${rowNum}`).wrapAll(
         '<div class="custom-flex-row"></div>'
       );
     }
-    // $(".swiper-pagination").css("flex-direction", "column");
-  }
+  };
 
   /* FlatUI switches on fractal page */
   $('[data-toggle="switch"]').bootstrapSwitch();
+
   // Function for toggling a day's 'completed status'
   $("#fractal .bootstrap-switch-label").click(function () {
     let currentDataName = $(this).closest(".swiper-slide").attr("data-name");
@@ -170,7 +187,7 @@ $(function () {
     });
   });
 
-  /* Asking if habit deletion is final */
+  /* Ask if habit deletion is final */
   $("button.btn-danger").click(function (event) {
     event.preventDefault();
     event.stopPropagation();
@@ -221,7 +238,6 @@ $(function () {
 
     let swiperSlides = swiperInstances[swiperId].slides;
     let habitLength = swiperSlides.length;
-    console.log(habitLength, swiperId);
 
     if (event.data.direction === "next") {
       switch (true) {
