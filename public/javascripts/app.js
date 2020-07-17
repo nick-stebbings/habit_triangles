@@ -16,7 +16,7 @@ $(function () {
     };
   })();
   // Adds flex-break divs to break up triangles into flex-row containers
-  const wrapped = function () {
+  const addFlexBreakOnFlexWrap = function () {
     var offset_top_prev;
 
     $(".triangle-wrapper").each(function () {
@@ -31,20 +31,26 @@ $(function () {
     });
   };
 
+  const addFlexBreakAfterNthTriangle = function (n, totalTriangles) {
+    let flexBreaksRequired = Math.floor(totalTriangles / n);
+    console.log(flexBreaksRequired);
+    let nextElement = n;
+    for (let i = 1; i <= flexBreaksRequired; i++) {
+      let nthTrianglesSelector = `#fractal .triangle-wrapper:nth-of-type(${nextElement})`; // The break comes one triangle earlier for each row
+      $(nthTrianglesSelector).after(
+        "<div class='flex-break custom-wrap'></div>"
+      );
+      n--;
+      nextElement += n;
+      console.log(nthTrianglesSelector, i);
+    }
+  };
+
   const addFlexRowsForAllHabits = function () {
     // Use our flex-breaks to delineate custom flex-rows for each habit instance
     for (let i = 0; i < swiperInstances.length; i++) {
       addFlexRowClasses(i);
     }
-  };
-
-  // Perform all functions needed to arrange flex-rows into pyramid
-  const formatPyramid = function () {
-    // After the window resize has definitely finished, perform pyramid alignment
-    // Dynamically resize triangles and turn them upside down to tessellate
-    formatTriangles(swiperInstances[0].slides.length);
-    waitForFinalEvent(wrapped, 0, "window-resize");
-    addFlexRowsForAllHabits();
   };
 
   // Initialise swipers for each habit
@@ -100,38 +106,44 @@ $(function () {
     swiperInstances.push(newSwiper);
   });
 
-  function formatTriangles(totalTriangles, triangleScale = 12, rowBreak = 9) {
+  function invertAndStyleTrianglesOverLimit(totalTriangles, rowBreak = 9) {
     // If habit is less than rowBreak days old, let rows be that wide
-    // Otherwise triangles wrap after rowBreak days
-    let rowWidth = Math.min(totalTriangles, rowBreak);
+    // Else add wrapping element after rowBreak days
+    let maxRowWidth = Math.min(totalTriangles, rowBreak);
 
-    if (rowWidth < totalTriangles) {
+    if (maxRowWidth < totalTriangles) {
+      styleInvertedTriangles();
+    }
+
+    function styleInvertedTriangles() {
       let oddTrianglesSelector =
         "#fractal .triangle-wrapper:nth-of-type(2n + 2) span.triangle";
-      let rowBreakTriangleSelector = `#fractal .triangle-wrapper:nth-of-type(${
-        2 * rowWidth
-      })`;
-
       $("#fractal span.triangle-wrapper").addClass("tessellated");
-      $(oddTrianglesSelector).css("border-width", "5em 2.8em 0em 2.8em");
-      $(oddTrianglesSelector).css(
-        "border-color",
-        "#2ecc71 transparent transparent transparent"
-      );
-      $(rowBreakTriangleSelector).after("<div class='flex-break'></div>");
 
-      // Scale the triangles based upon scale argument and row width
-      let triangleWidth = triangleScale * (1 / rowWidth).toFixed(3);
-      $("#fractal .swiper-pagination").css("font-size", `${triangleWidth}vh`);
-      // addFlexRowClasses();
+      // Add styling for inverted triangles
+      $(oddTrianglesSelector).each(function (idx, element) {
+        let dayNotCompleted = [...element.classList].includes(
+          "triangle-notyet"
+        );
+        $(this).attr(
+          "style",
+          "border-color: " +
+            (dayNotCompleted ? "#f1c40f" : "#2ecc71") +
+            " transparent transparent transparent;" +
+            "border-width: 5em 2.8em 0em 2.8em"
+        );
+        $(this).find("span").attr("style", "bottom: 2.8em");
+      });
     }
   }
-
+  function scaleTriangles(scaleFactor, maxRowWidth) {
+    let triangleWidth = scaleFactor * (1 / maxRowWidth).toFixed(3);
+    $("#fractal .swiper-pagination").css("font-size", `${triangleWidth}vh`);
+  }
   // Add class identifiers to each element that was wrapped onto the next flex row.
   // custom-flex-rows are zero indexed from most recent habit day to the oldest habit day
   const addFlexRowClasses = function (swiperId) {
     let flexBreakIndex = Math.max($("[class*='flex-break']").length - 1, 0);
-    let numRows = flexBreakIndex;
 
     // Add classes to the span elements in each row
     let pagTriangles = $(`#triangles-${swiperId}`).children();
@@ -141,16 +153,35 @@ $(function () {
       }
       $(this).addClass(`flex-row-${flexBreakIndex}`);
     });
-    wrapFlexRows(numRows, swiperId);
+    // wrapFlexRows(numRows, swiperId);
   };
 
   // Wrap all (spans with the same row-classes) in a container div for the row
   const wrapFlexRows = function (numRows, swiperId) {
+    console.log(numRows);
     for (let rowNum = 0; rowNum <= numRows; rowNum++) {
       $(`#triangles-${swiperId} .flex-row-${rowNum}`).wrapAll(
         '<div class="custom-flex-row"></div>'
       );
     }
+  };
+
+  // Perform all functions needed to arrange flex-rows into pyramid
+  const formatPyramid = function (scale = 15, rowLimit = 9) {
+    let baseHabitLength = swiperInstances[0].slides.length;
+    // DEBUG: Establish number of flex rows for each habit.
+    // ITERATE through habits, performing these actions
+    // -
+    // -
+    // -
+    // -
+    addFlexBreakAfterNthTriangle(rowLimit, baseHabitLength);
+    invertAndStyleTrianglesOverLimit(baseHabitLength, rowLimit);
+    // addFlexRowsForAllHabits();
+    addFlexBreakOnFlexWrap();
+    addFlexRowsForAllHabits();
+    wrapFlexRows($("#triangles-0 [class*='flex-break']").length, 0);
+    scaleTriangles(scale, rowLimit);
   };
 
   /* FlatUI switches on fractal page */
@@ -273,9 +304,11 @@ $(function () {
       }
     }
   }
+  formatPyramid();
 
   $(window).resize(formatPyramid);
-  formatPyramid();
+  // After the window resize has definitely finished, perform pyramid alignment
+  // Dynamically resize triangles and turn them upside down to tessellate
   // PSEUDO CODE:
   // For the prev button
   // prevent swiping until base habit's arrow controller is pressed, then OnClick:
