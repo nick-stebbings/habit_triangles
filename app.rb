@@ -232,7 +232,7 @@ post "/" do
     @page_title = 'Error: 422'
     halt 422, erb(:index)
   end
-  session[:message] = nil
+  session[:message] = nil 
   redirect "/habits/#{first_habit.id}/update?initial=true"
 end
 
