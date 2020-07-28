@@ -74,7 +74,6 @@ helpers do
       "The task must be between 1 and 100 characters"
     end
   end
-  
 end
 
 configure do
@@ -149,19 +148,34 @@ def calculate_streak(habit)
   count
 end
 
+def instantiate_3_habits(objective_name)
+  Array.new(3) do |i|
+    habit_id = get_next_id(:habit) + i
+    habit_name = objective_name + "_cornerstone_#{i}"
+    options = { aspect: params[:aspect_tag] }
+
+    Habit.new(habit_id, habit_name, options) 
+  end
+end
+
+def valid_input(string, type)
+  !!string && (type == :habit ? valid_habit_description?(string) : valid_objective_name?(string))
+end
+
 # old helpers do
   def in_paragraphs(text)
     text.split("\n").map { |para| "<p>#{para}</p>" }.join
   end
 
-  def snake_case(phrase)
-    phrase.downcase.split(' ').join('_')
+  def make_identifier(phrase)
+    phrase.downcase.split(' ').join('_').strip
   end
   
   def render_markdown(text)
     renderer = Redcarpet::Markdown.new(Redcarpet::Render::HTML)
     renderer.render(text)
   end
+
 # end
 
 before do
@@ -191,41 +205,32 @@ get "/" do
   # end
 end
 
-post "/" do # Process front page choice of new objective or new habit
+post "/" do
+  # Process front page choice of new objective or new habit
   # We pass a query parameter to indicate first app use to lead the user through
+
   first_habit = nil
+  user_input_objective = params[:objective_name]
+  user_input_habit = params[:habit_description]
 
-  if !!params[:objective_name] && valid_objective_name?(params[:objective_name].strip)
+  if valid_input(user_input_objective, :obj)
     # Once a valid objective name has been entered, convert it to a label to use as a hash key in session[:objectives]
-    objective_name = snake_case(params[:objective_name].strip)
-    # Instantiate a new objective with 3 new habits, redirect to a page to flesh out the first habit
-    objective_id = get_next_id(:objective) 
+    objective_identifier = make_identifier(user_input_objective)
+    habits_ary = instantiate_3_habits(objective_identifier)
 
-    # Add 3 new habits to a new objective instance
-    new_habit_ary = Array.new(3) do |i|
-      habit_id = get_next_id(:habit) + i
-      habit_name = objective_name + "_cornerstone_#{i}"
-      opt = { aspect: params[:aspect_tag] }
+    # Add new objects to the session
+    session[:objectives][objective_identifier] = Objective.new(get_next_id(:objective), habits_ary, objective_identifier)
+    habits_ary.each { |h| session[:habits] << h }
 
-      Habit.new(habit_id, habit_name, opt) 
-    end
-    session[:objectives][objective_name] = Objective.new(objective_id, new_habit_ary, objective_name)
-
-    # Add them to the overall habit list, too
-    session[:objectives][objective_name].habits.each do |habit|
-      session[:habits] << habit
-    end
-    # Our first habit to flesh out
-    first_habit = session[:objectives][objective_name].habits.first
-  elsif !!params[:habit_description] && valid_habit_description?(params[:habit_description].strip)
-    habit_name = snake_case(params[:habit_description])
-    # Out only habit to flesh out
-    first_habit = Habit.new(get_next_id(:habit), habit_name, aspect: params[:aspect_tag])
-    # Add it to the overall habit list
+    first_habit = habits_ary.first
+  elsif valid_input(user_input_habit, :habit)
+    first_habit = Habit.new(get_next_id(:habit), make_identifier(user_input_habit), aspect: params[:aspect_tag])
     session[:habits] << first_habit
   else
-    session[:message] = MESSAGES[:invalid_objective_name]
-    halt 422, erb(:index) if session[:message]
+    session[:message] = !valid_objective_name?(user_input_objective) ? MESSAGES[:invalid_objective_name] : MESSAGES[:invalid_habit_description]
+    @intro_spiel = session[:message]
+    @page_title = 'Error: 422'
+    halt 422, erb(:index)
   end
   redirect "/habits/#{first_habit.id}/update?initial=true"
 end
@@ -341,28 +346,32 @@ end
 get /\/habits\/fractal((\/(?:\d{1,})){1,})/ do
   # Split habit_id parameters into an array of integers
   habits_in_chain = params['captures'].first.split("/")[1..-1].map(&:to_i)
-  @habits = habits_in_chain.map { |id| get_habit(id) }
-  @habits.each { |h| h.update_to_today! }
-  @habits = @habits.sort_by! { |h| h.length }.reverse
+
+  @habits = habits_in_chain
+    .map { |id| get_habit(id) }
+    .sort_by(&:length).reverse
+    .each { |h| h.update_to_today! }
+
   @base_habit = @habits.first
   @length_of_longest_habit = @base_habit.length
 
   @intro_spiel = render_markdown(params[:initial] ? TEXT[:existing_habit][:new] : TEXT[:existing_habit][:old])
   @page_title = "Fractal Habit Triangle"
-  @reference_date = @habits.max_by { |h| h.length }.date_of_initiation
-  # binding.pry
+  @reference_date = @habits.max_by(&:length).date_of_initiation
+
   erb :fractal
 end
 
 post /\/habits\/fractal((\/(?:\d{1,})){1,})/ do
   habits_in_chain = params['captures'].first.split("/")[1..-1].map(&:to_i)
   @habits = habits_in_chain.map { |id| get_habit(id) }
-
   @habit = @habits.first
-  day_toggle_switch_value = ("completed-day-" + params[:node_completed_index])
+
+  toggle_day_switch_value = ("completed-day-" + params[:node_completed_index])
+
   habit_node_for_day = @habit.get_nth(params[:node_completed_index].to_i)
-  binding.pry
-  habit_node_for_day.today = params.key?(day_toggle_switch_value) ? 't' : 'f'
+  habit_node_for_day.today = params.key?(toggle_day_switch_value) ? 't' : 'f'
+
   redirect "/habits/fractal/#{@habit.id}"
 end
 

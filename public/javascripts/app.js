@@ -158,7 +158,7 @@ $(function () {
 
   // Wrap all (spans with the same row-classes) in a container div for the row
   const wrapFlexRows = function (numRows, swiperId) {
-    console.log(numRows);
+    console.log("number of rows:", numRows);
     for (let rowNum = 0; rowNum <= numRows; rowNum++) {
       $(`#triangles-${swiperId} .flex-row-${rowNum}`).wrapAll(
         '<div class="custom-flex-row"></div>'
@@ -169,12 +169,7 @@ $(function () {
   // Perform all functions needed to arrange flex-rows into pyramid
   const formatPyramid = function (scale = 15, rowLimit = 9) {
     let baseHabitLength = swiperInstances[0].slides.length;
-    // DEBUG: Establish number of flex rows for each habit.
-    // ITERATE through habits, performing these actions
-    // -
-    // -
-    // -
-    // -
+    console.log("hello");
     addFlexBreakAfterNthTriangle(rowLimit, baseHabitLength);
     invertAndStyleTrianglesOverLimit(baseHabitLength, rowLimit);
     // addFlexRowsForAllHabits();
@@ -183,7 +178,7 @@ $(function () {
     wrapFlexRows($("#triangles-0 [class*='flex-break']").length, 0);
     scaleTriangles(scale, rowLimit);
   };
-
+  formatPyramid(15, 12);
   /* FlatUI switches on fractal page */
   $('[data-toggle="switch"]').bootstrapSwitch();
 
@@ -247,20 +242,6 @@ $(function () {
     customButtonEvents
   );
 
-  // function getSwiperInstanceSlides(swiperId) {
-  //   return $(".swiper-wrapper")
-  //     .children(".swiper-slide")
-  //     .filter((idx, slide) => $(slide).data("name")[0] === swiperId.toString());
-  // }
-
-  // function getActivePaginationTriangle(swiperId) {
-  //   return $("#triangles-" + swiperId + " .triangle-wrapper")
-  //     .children(".triangle")
-  //     .filter((idx, slide) =>
-  //       $(slide).hasClass("swiper-pagination-bullet-active")
-  //     );
-  // }
-
   // Using this function to change display of the remaining (shorter) habits when the prev button is clicked
   function customButtonEvents(event) {
     let swiperId = event.data.swiperId;
@@ -304,31 +285,8 @@ $(function () {
       }
     }
   }
-  formatPyramid();
 
-  $(window).resize(formatPyramid);
-  // After the window resize has definitely finished, perform pyramid alignment
-  // Dynamically resize triangles and turn them upside down to tessellate
-  // PSEUDO CODE:
-  // For the prev button
-  // prevent swiping until base habit's arrow controller is pressed, then OnClick:
-  //  - SET current_node to be the active slide of the base habit
-  //  - FOREACH swiper
-  //    - SET the habit_length var to be length of swiper's habit
-  //    - CASE current_node
-  //        - WHEN == habit_length
-  //          - then toggle the active class for the last bullet element in pagination
-  //        - WHEN  > habit length
-  //          - then click the habit's prev button
-
-  // For the next button
-  // prevent swiping until base habit's arrow controller is pressed, then OnClick:
-  //  - SET current_node to be the active slide of the base habit
-  //  - FOREACH swiper
-  //    - SET the habit_length var to be length of swiper's habit
-  //    - CASE current_node
-  //        - WHEN == habit_length
-  //          - then toggle the active class for the last bullet element in pagination
-  //        - WHEN  < habit length
-  //          - then click the habit's prev button
+  $(window).resize(function (event) {
+    formatPyramid(18, 12);
+  });
 });
