@@ -113,7 +113,7 @@ phrase.match? %r{^(?:\w* ){0,4}\w+$} # Matches 'up to five words split by a spac
 end
 
 def valid_habit_description?(phrase)
-  phrase.length < 50
+  (1..50).cover? phrase.strip.length
 end
 
 def valid_date?(initiation)
@@ -212,8 +212,8 @@ post "/" do
   first_habit = nil
   user_input_objective = params[:objective_name]
   user_input_habit = params[:habit_description]
-
-  if valid_input(user_input_objective, :obj)
+  case
+  when valid_input(user_input_objective, :obj)
     # Once a valid objective name has been entered, convert it to a label to use as a hash key in session[:objectives]
     objective_identifier = make_identifier(user_input_objective)
     habits_ary = instantiate_3_habits(objective_identifier)
@@ -223,15 +223,16 @@ post "/" do
     habits_ary.each { |h| session[:habits] << h }
 
     first_habit = habits_ary.first
-  elsif valid_input(user_input_habit, :habit)
+  when valid_input(user_input_habit, :habit)
     first_habit = Habit.new(get_next_id(:habit), make_identifier(user_input_habit), aspect: params[:aspect_tag])
     session[:habits] << first_habit
-  else
-    session[:message] = !valid_objective_name?(user_input_objective) ? MESSAGES[:invalid_objective_name] : MESSAGES[:invalid_habit_description]
+  when user_input_habit && !valid_input(user_input_habit, :habit) || user_input_objective && !valid_input(user_input_objective, :obj)
+    session[:message] = user_input_objective ? MESSAGES[:invalid_objective_name] : (MESSAGES[:invalid_habit_description] if user_input_habit)
     @intro_spiel = session[:message]
     @page_title = 'Error: 422'
     halt 422, erb(:index)
   end
+  session[:message] = nil
   redirect "/habits/#{first_habit.id}/update?initial=true"
 end
 
