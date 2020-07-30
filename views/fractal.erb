@@ -38,6 +38,7 @@
           </div>
 
           <% @habits.each_with_index do |habit, habit_idx| %>
+          
           <% if habit_idx.zero? then next end %>
           <div class="swiper-container">
             <div class="swiper-wrapper">
@@ -46,11 +47,47 @@
               <!-- We need the slides for the pagination triangles, each slide with data-name attribute   -->
               <% @date_of_completion = habit.date_of_initiation + (habit.length - node_idx - 1) %>
               <div class="swiper-slide" data-name="<%== "#{habit_idx}-#{node_idx}-day-#{node.today}" %>"
-                data-date="<%== "#{@date_of_completion.strftime '%d'}" %>">&nbsp;</div>
-              <% node_idx += 1 %>
-              <% end %>
+                data-date="<%== "#{@date_of_completion.strftime '%d'}" %>">&nbsp;
 
-            </div><!-- End swiper instance wrapper -->
+ <!-- Day specific information -->
+ <dl class="h-flex">
+   <dt class="input-group-prepend"><span class="input-group-text">Days Tracked:</span></dt>
+   <dd class="habit-tracked-length"><%= @habits.first.length %></dd>
+   <dt class="input-group-prepend"><span class="input-group-text">Date:</span></dt>
+   <dd class="habit-tracked-day">
+     <%= @date_today.strftime "%d/%m/%Y" %></dd>
+ </dl>
+ <!-- Habit specific information -->
+ <dl class="v-flex habit-list">
+   <dt class="input-group-text">
+     <div><%== render_markdown(@habits.first.name.split('_').join("\n\r")) %></div>
+   </dt>
+   <dd class="habit-tracked-toggle h-flex">
+
+     <!-- Toggle button -->
+     <% if @habits.first.is_atomic %>
+
+     <button class="btn btn-inverse">
+       <a href="/habits/<%= @habits.first.id %>/list/<%= @habits.first.length - node_idx - 1 %>">Tasks</a>
+     </button>
+     <% end %>
+     <button class="btn btn-info">
+       <a href="/habits/<%= @habits.first.id %>">Summary</a>
+     </button>
+     <div class="bootstrap-switch-square">
+       <input name="completed-day-<%= node_idx %>" id="completed-day-<%= node_idx %>" type="checkbox"
+         data-toggle="switch"
+         data-on-text="<i class='fui-check'></i>" data-off-text="<i class='fui-cross'></i>" <% if (node.today == 't') %>
+         checked <% end %> />
+       <%= node.today %>
+
+     </div>
+   </dd>
+ </dl>
+              </div><!-- End swiper slide -->
+              <% node_idx += 1 %>
+              <% end %><!-- End node instance -->
+            </div><!-- End habit swiper instance wrapper -->
             <!-- Add Arrows -->
             <div class="swiper-button-next hidden"></div>
             <div class="swiper-button-prev hidden"></div>

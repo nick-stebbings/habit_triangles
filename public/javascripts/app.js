@@ -101,48 +101,48 @@ $(function () {
   });
 
   // Using this function to change display of the remaining (shorter) habits when the prev button is clicked
-  // function customButtonEvents(event) {
-  //   let swiperId = event.data.swiperId;
-  //   var btnClass = `.swiper-btn-${event.data.direction}-${swiperId}`;
-  //   var baseHabitCurrentDay = swiperInstances[0].activeIndex;
+  function customButtonEvents(event) {
+    let swiperId = event.data.swiperId;
+    var btnClass = `.swiper-btn-${event.data.direction}-${swiperId}`;
+    var baseHabitCurrentDay = swiperInstances[0].activeIndex;
 
-  //   let swiperSlides = swiperInstances[swiperId].slides;
-  //   let habitLength = swiperSlides.length;
+    let swiperSlides = swiperInstances[swiperId].slides;
+    let habitLength = swiperSlides.length;
 
-  //   if (event.data.direction === "next") {
-  //     switch (true) {
-  //       case baseHabitCurrentDay == habitLength + 1:
-  //         console.log(getActivePaginationTriangle(swiperId));
+    if (event.data.direction === "next") {
+      switch (true) {
+        case baseHabitCurrentDay == habitLength + 1:
+          console.log(getActivePaginationTriangle(swiperId));
 
-  //         getActivePaginationTriangle(swiperId).toggleClass(
-  //           "swiper-pagination-bullet-active"
-  //         );
-  //         console.log("toggle fwd");
-  //         break;
-  //       case baseHabitCurrentDay <= habitLength:
-  //         console.log("forward hab 1");
-  //         $(btnClass).click();
-  //         break;
-  //       default:
-  //         console.log("nowt");
-  //     }
-  //   } else if (event.data.direction === "prev") {
-  //     switch (true) {
-  //       case baseHabitCurrentDay == habitLength:
-  //         $(swiperSlides.slice(-1)).toggleClass(
-  //           "swiper-pagination-bullet-active"
-  //         );
-  //         console.log("slide:", swiperSlides[habitLength - 1]);
-  //         break;
-  //       case baseHabitCurrentDay <= habitLength:
-  //         $(btnClass).click();
-  //         console.log("back up habit 1");
-  //         break;
-  //       default:
-  //         console.log("nowt");
-  //     }
-  //   }
-  // }
+          getActivePaginationTriangle(swiperId).toggleClass(
+            "swiper-pagination-bullet-active"
+          );
+          console.log("toggle fwd");
+          break;
+        case baseHabitCurrentDay <= habitLength:
+          console.log("forward hab 1");
+          $(btnClass).click();
+          break;
+        default:
+          console.log("nowt");
+      }
+    } else if (event.data.direction === "prev") {
+      switch (true) {
+        case baseHabitCurrentDay == habitLength:
+          $(swiperSlides.slice(-1)).toggleClass(
+            "swiper-pagination-bullet-active"
+          );
+          console.log("slide:", swiperSlides[habitLength - 1]);
+          break;
+        case baseHabitCurrentDay <= habitLength:
+          $(btnClass).click();
+          console.log("back up habit 1");
+          break;
+        default:
+          console.log("nowt");
+      }
+    }
+  }
 
   $(window).resize(function (event) {
     Triangle.formatPyramid(
