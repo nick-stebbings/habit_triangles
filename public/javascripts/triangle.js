@@ -1,5 +1,59 @@
-const TRIANGLE_SCALE_FACTOR = 18;
+const TRIANGLE_SCALE_FACTOR = 15;
 const BASE_ROW_WRAP_LENGTH = 12;
+var swiperInstances = [];
+
+  // Initialise swipers for each habit
+  // (habit IDs were already passed and habit swiper markup included in fractal template)
+  $(".swiper-container").each(function (index, element) {
+    var $this = $(this);
+    // Create distinctly numbered classes for swiper elements of each swiper instance
+    $this.addClass("instance-" + index);
+    $this
+      .find(".swiper-pagination")
+      .slice(0, 1)
+      .addClass("swiper-pagination-" + index);
+    $this
+      .find(".swiper-pagination")
+      .slice(0, 1)
+      .attr("id", "triangles-" + index);
+    $this
+      .find(".swiper-button-prev")
+      .slice(0, 1)
+      .addClass("swiper-btn-prev-" + index);
+    $this
+      .find(".swiper-button-next")
+      .slice(0, 1)
+      .addClass("swiper-btn-next-" + index);
+
+    var newSwiper = new Swiper(".instance-" + index, {
+      // Settings
+      nextButton: ".swiper-btn-next-" + index,
+      prevButton: ".swiper-btn-prev-" + index,
+      paginationType: "bullets",
+      paginationClickable: true,
+      pagination: "#triangles-" + index,
+      // Custom pagination rendering for triangles interface
+      paginationBulletRender: function (index, className) {
+        var currentSlide = $("." + this.wrapperClass).find(".swiper-slide")[
+          index
+        ];
+        var dayCompletedClass =
+          $(currentSlide).attr("data-name").slice(-1) == "t"
+            ? "success"
+            : "notyet";
+        var bulletStyles =
+          '<span class="triangle-wrapper"><span class="' +
+          className +
+          " triangle triangle-" +
+          dayCompletedClass +
+          '"><span>' +
+          $(currentSlide).attr("data-date") +
+          "</span></span></span>";
+        return bulletStyles;
+      },
+    });
+    swiperInstances.push(newSwiper);
+  });
 // Waits for an event to fully elapse before callback is executed
 const waitForFinalEvent = (function () {
   var timers = {};
@@ -131,8 +185,6 @@ const workingTriangleWidth = function(workingFontSize) {
   return workingFontSize * 3.5;
 };
 
-var swiperInstances = [];
-
 // Perform all functions needed to arrange flex-rows into pyramid
 const formatPyramid = function (
   rowLimit = BASE_ROW_WRAP_LENGTH,
@@ -154,8 +206,6 @@ const formatPyramid = function (
       if (rowNeedsWrapping(rowLength)) {
         styleInvertedTriangles(habitIndex, rowIndex);
       }
-
-      addFlexRowPadding(rowIndex);
     }
   }
 
@@ -163,6 +213,51 @@ const formatPyramid = function (
   scaleTriangles(rowLimit);
 };
 
+
+  // Using this function to change display of the remaining (shorter) habits when the prev button is clicked
+  function customButtonEvents(event) {
+    let swiperId = event.data.swiperId;
+    var btnClass = `.swiper-btn-${event.data.direction}-${swiperId}`;
+    var baseHabitCurrentDay = swiperInstances[0].activeIndex;
+
+    let swiperSlides = swiperInstances[swiperId].slides;
+    let habitLength = swiperSlides.length;
+
+    if (event.data.direction === "next") {
+      switch (true) {
+        case baseHabitCurrentDay == habitLength + 1:
+          console.log(getActivePaginationTriangle(swiperId));
+
+          getActivePaginationTriangle(swiperId).toggleClass(
+            "swiper-pagination-bullet-active"
+          );
+          console.log("toggle fwd");
+          break;
+        case baseHabitCurrentDay <= habitLength:
+          console.log("forward hab 1");
+          $(btnClass).click();
+          break;
+        default:
+          console.log("nowt");
+      }
+    } else if (event.data.direction === "prev") {
+      switch (true) {
+        case baseHabitCurrentDay == habitLength:
+          $(swiperSlides.slice(-1)).toggleClass(
+            "swiper-pagination-bullet-active"
+          );
+          console.log("slide:", swiperSlides[habitLength - 1]);
+          break;
+        case baseHabitCurrentDay <= habitLength:
+          $(btnClass).click();
+          console.log("back up habit 1");
+          break;
+        default:
+          console.log("nowt");
+      }
+    }
+  }
+  
 export {
   swiperInstances,
   TRIANGLE_SCALE_FACTOR,

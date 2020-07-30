@@ -235,18 +235,9 @@ dl.h-flex.side-by-side > dd {
   height: 100%;
 }
 
-#fractal .card-header {
-  height: 90vh;
-}
-
 /* Headings */
 #fractal .card-header {
   padding: 0;
-}
-
-#fractal .h-flex:first-child {
-  /* margin: 0 auto;
- padding-left: 20%; */
 }
 
 /* Per-habit dashboard (sidebar)*/
@@ -319,27 +310,17 @@ span.triangle-wrapper {
 }
 /* Pagination text and alignment*/
 
-#fractal .h-flex {
-  justify-content: center;
-  align-items: flex-start;
-  margin: 0;
-}
-
 #fractal span.triangle span {
   position: relative;
   font-weight: bold;
   color: white;
   font-size: 1.8em;
-  right: 8px;
-}
-
-div.custom-flex-row > span.tessellated:nth-child(2n) span span {
-  /* bottom: 2.5em; */
+  right: 5px;
 }
 
 .swiper-pagination-wrapper {
   height: 100%;
-  width: 100%;
+  /* width: 100%; */
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -391,34 +372,25 @@ div.custom-flex-row > span.tessellated:nth-child(2n) span span {
 .custom-flex-row:nth-of-type(3) {
   order: 1;
   flex-basis: 100%;
-  /* padding: 0 5.6em; */
 }
 .tessellated {
   margin-left: -2.8em;
 }
 .custom-flex-row {
   display: flex;
-  justify-content: start;
-}
-.flex-break {
-  flex-basis: 5.6em;
-}
-
-#fractal .habit-dashboard-container {
-  grid-area: side;
+  justify-content: center;
+  left: -12em;
+  position: relative;
 }
 
-/* .swiper-container.instance-1, */
-/* .swiper-container.instance-2, */
 .swiper-container.instance-0 > .swiper-pagination-wrapper {
   grid-area: bot;
-  border: 1px solid black;
+  margin-left: 7em;
 }
 
 #fractal .swiper-wrapper {
-  /* Hide the actual slides */
   position: absolute;
-  right: -9999px;
+  /* right: -9999px; */
 }
 
 .swiper-container.instance-1 {
@@ -433,6 +405,17 @@ div.custom-flex-row > span.tessellated:nth-child(2n) span span {
   border: 1px solid black;
 }
 
+#fractal .card dl {
+  width: 20%;
+}
+
+#fractal form {
+  height: 40vh;
+}
+.instance-0 .swiper-wrapper .swiper-slide {
+  grid-area: side;
+  /* width: auto; */
+}
 /* .swiper-pagination-wrapper, */
 /* .swiper-container.instance-2, */
 /* .swiper-container.instance-1 { */

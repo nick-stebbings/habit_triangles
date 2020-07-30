@@ -29,6 +29,25 @@ end
 
 # For list module
 helpers do
+  ## Getters
+  def get_habit(id)
+    session[:habits].find { |habit| habit.id == id }
+  end
+
+  def get_objective(id)
+    session[:objectives].values.first { |objective| objective.id == id }
+  end
+
+  def get_next_id(of)
+    case of
+    when :objective
+      max = session[:objectives].values.map { |objective| objective.id }.max || -1
+    when :habit
+      max = session[:habits].map { |habit| habit.id }.max || -1
+    end
+    max + 1
+  end
+
   def get_task_list(habit_id, habit_list_id)
     session[:lists].find { |l| (l[:habit_id] = habit_id) && (l[:habit_list_id] == habit_list_id) }
   end
@@ -47,25 +66,12 @@ helpers do
     list[:todos].each { |t| t[:completed] = false }
   end
 
-  # def incomplete_tasks_string(habit_id, habit_list_id)
-  #   "#{incomplete_tasks(habit_id, habit_list_id)}/#{list_size(habit_list_id)}"
-  # end
-
   # Sort Todos on a list by "completed". 
   def sort_todos(list)
     complete, incomplete = list.partition{ |task| task[:completed] }
 
     incomplete.each{ |task| yield(task, list.index(task)) }
     complete.each{ |task| yield(task, list.index(task)) }
-  end
-
-  # Return an error message if the name is invalid, otherwise return nil.
-  def error_for_list_name(name)
-    if !(1..100).cover? name.size   
-      "The list name must be between 1 and 100 characters"
-    elsif session[:lists].any? {|list| list[:name] == name }
-      "The list name must be unique."
-    end
   end
 
   # Return an error message if the Todo is invalid, otherwise return nil.
@@ -83,23 +89,6 @@ configure do
   also_reload "paragraphs_text.yaml" if development?
 end
 
-def get_habit(id)
-  session[:habits].find { |habit| habit.id == id }
-end
-
-def get_objective(id)
-  session[:objectives].values.first { |objective| objective.id == id }
-end
-
-def get_next_id(of)  # Return next id in overall objectives hash/habits ary
-  case of
-  when :objective
-    max = session[:objectives].values.map { |objective| objective.id }.max || -1
-  when :habit
-    max = session[:habits].map { |habit| habit.id }.max || -1
-  end
-  max + 1
-end
 
 def habits_last_list(habit_id)
   all_lists_for_habit = session[:lists].select do |list|
@@ -195,14 +184,9 @@ error do
 end
 
 get "/" do
-  # if session[:objectives].empty?
     @page_title = 'Happy Habit Triangles'
     @intro_spiel = render_markdown(TEXT[:intro_page][:first])
     erb :index
-  # else
-  #   current_objective = session[:objectives].values.min_by { |objective| objective.id } #this criteria will change
-  #   redirect "/objectives/#{current_objective.id}"
-  # end
 end
 
 post "/" do
@@ -236,11 +220,12 @@ post "/" do
   redirect "/habits/#{first_habit.id}/update?initial=true"
 end
 
+## Objectives Routes
 get "/objectives/:id/update" do |id|
   @objective = get_objective(id.to_i)
   @habits = @objective.habits
 
-  @page_tite = "List of Habits"
+  @page_tite = "Objective Summary"
   @intro_spiel = "This dashboard allows you to take a quick glance at a list of habits - those linked by objective or all habits in the system."
   @sub_info = "This is a list of habits for the objective named <b>#{@objective.name}</b>."
   
@@ -250,32 +235,26 @@ end
 get "/objectives/:id" do |id|
   @objective = get_objective(id.to_i)
 
-  @page_tite = "List of Habits"
+  @page_tite = "List of Habits By Objective"
   @intro_spiel = "This dashboard allows you to take a quick glance at a list of habits - those linked by objective or all habits in the system."
   @sub_info = "This is a list of habits for the objective named <b>#{@objective.name}</b>."
   erb :index_habits, :layout => :simple_layout
 end
 
-get "/objectives/:id/update" do |id|
-  @objective = get_objective(id.to_i)
-  @page_title = "Objective Summary"
-  @intro_spiel = "This is a list of habits for the objective named <b>#{@objective.name}</b>."
-  erb :update_objective, :layout => :simple_layout
-end
+# get "/objectives/:id/update" do |id|
+#   @objective = get_objective(id.to_i)
+#   @page_title = "Objective Summary"
+#   @intro_spiel = "This is a list of habits for the objective named <b>#{@objective.name}</b>."
+#   erb :update_objective, :layout => :simple_layout
+# end
 
+## Habit Routes
 get "/habits" do
   @page_title = "List of Habits"
   @intro_spiel = "This is a list of all habits."
   @habits = session[:habits]
   erb :index_habits, :layout => :simple_layout
 end
-
-# depreciated, creating single habits is not the point
-# get "/habits/new" do
-#   @atomic = false
-#   @page_title = 'Create a new Habit'
-#   erb :new_habit
-# end
 
 get "/habits/:id" do |id|
   @habits = [get_habit(id.to_i)]
@@ -343,7 +322,6 @@ post "/habits/:id/delete" do |id|
 end
 
 ## Fractal Habit Triangle
-
 get /\/habits\/fractal((\/(?:\d{1,})){1,})/ do
   # Split habit_id parameters into an array of integers
   habits_in_chain = params['captures'].first.split("/")[1..-1].map(&:to_i)
@@ -377,15 +355,6 @@ post /\/habits\/fractal((\/(?:\d{1,})){1,})/ do
 end
 
 ## Todo List Modular Routes
-
-# Create a new list attached to Atomic Habit id
-# post "/habits/:id/list" do |id|
-#   list_name = params[:habit_name].strip
-#   session[:lists] << { name: list_name, todos: []}
-#   session[:message] = "The list has been created."  
-#   redirect "/habits/#{id}" 
-# end
-
 # View a list
 get "/habits/:habit_id/list/:list_id" do |habit_id, list_id|
   @page_title = "View Habit Actions"

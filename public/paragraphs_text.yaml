@@ -22,7 +22,7 @@
 
     Tick off items and it will save it for you automatically.
 
-    Or, click 'Day Completed' to mark the habit as done for the day!
+    Or, click 'Complete Habit for Today' to mark the habit as done for the day!
 
 :existing_habit:
   :new: >
@@ -42,4 +42,4 @@
     We've given the habit a description, and a tag for the aspect of your life that it covers.
     Now we want to find out if this is an **atomic** habit, that we could reduce to a list of actions.
 
-    Check the box once you've decided if it is _atomic_, then click 'start tracking'.
+    Mark with a tick if you've decided if it is _atomic_, then click 'start tracking' to make it a simple list.
