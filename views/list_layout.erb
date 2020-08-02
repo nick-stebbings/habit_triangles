@@ -32,20 +32,20 @@
       <div class="col">
         <div class="jumbotron m-auto">
           <h1 class="text-center"><%= @page_title %></h1>
-          <%== in_paragraphs(@intro_spiel) %>
-          <% if session[:message] %>
-          <div class="alert alert-warning" role="alert">
-            <%= session.delete(:message) %>
-          </div>
-          <% end %>
+          <%== @intro_spiel %>
         </div>
       </div>
     </div>
 
     <div class="row">
       <div class="col">
-        <div class="card">
+        <div class="card" role="region">
           <div class="card-header">
+            <% if session[:message] %>
+            <div class="alert alert-warning" role="alert">
+              <%= session.delete(:message) %>
+            </div>
+            <% end %>
           </div>
           <div class="card-body">
             <%== yield %>
@@ -55,11 +55,10 @@
     </div>
   </div>
 
-  <script src="" async defer></script>
   <!-- Loading JS Assets -->
-<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/popper.js@1.14.1/dist/umd/popper.min.js" crossorigin="anonymous"></script>
   <script src="/javascripts/flat-ui.js"></script>
-  <script type="module" src="/javascripts/app.js"></script>
+  <script src="/javascripts/app.js"></script>
 </body>
 </html>

@@ -31,7 +31,6 @@
       <div class="col">
         <div class="jumbotron m-auto">
           <h1 class="text-center"><%= @page_title %></h1>
-          
           <%== in_paragraphs(@intro_spiel) unless session[:message] %>
           <% if session[:message] %>
           <div class="alert alert-warning" role="alert">
@@ -44,11 +43,11 @@
 
     <div class="row">
       <div class="col">
-        <div class="card">
+        <div class="card" role="region">
           <div class="card-header">
             <%== @sub_info  %>
           </div>
-          <div class="card-body">
+          <div class="card-body col-sm-12">
             <%== yield %>
           </div>
         </div>
@@ -56,9 +55,9 @@
     </div>
   </div>
 
-  <script src="" async defer></script>
   <!-- Loading JS Assets -->
   <script src="/javascripts/jquery-3.4.0.js"></script>
+  <script src="https://unpkg.com/popper.js@1.14.1/dist/umd/popper.min.js" crossorigin="anonymous"></script>
   <script src="/javascripts/bootstrap.min.js"></script>
   <script src="/javascripts/flat-ui.js"></script>
   <script type="module" src="/javascripts/app.js"></script>

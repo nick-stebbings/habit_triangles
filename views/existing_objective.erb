@@ -1,8 +1,7 @@
-<h3>Let's use it to test out some headers!</h3>
 <% habits = @objective.habits %>
 <% habit_ids = habits.map { |h| h.id.to_s } %>
 <div class="input-group side-by-side">
-  <div class="input-group-prepend"><span class="input-group-text">Name</span></div>
+  <div class="input-group-prepend"><span class="input-group-text">Objective Name</span></div>
   <input type="text" class="form-control" name="objective_name" value="<%= @objective.name %>"
     placeholder="Describe the behaviour" required id="objective-name">
   <label class="fui-new" for="objective-name"></label>
@@ -10,7 +9,7 @@
 
 <div class="input-group side-by-side">
   <div class="input-group-prepend"><span class="input-group-text">Description</span></div>
-  <input type="text" class="form-control" name="objective_description" value="<%= @objective.description %>"
+  <input type="text" class="form-control" name="objective_description" value="<%= @objective %>"
     placeholder="Describe the behaviour" required id="objective-description">
   <label class="fui-new" for="objective-description"></label>
 </div>
@@ -27,17 +26,21 @@
     value="<%= habits.first.date_of_initiation.strftime('%Y-%m-%d') %>" id="objective-start-date">
   <label class="fui-calendar" for="objective-start-date"></label>
 </div>
+<a href="<%= "/objectives/#{@objective.id}/update" %>" class="btn btn-warning btn-lg btn-block">Update Objective Details</a>
 
-<div class="h-flex">
+<div class="objective-dashboard h-flex">
   <div class="card-header">Running Streaks:</div>
   <div class="card-body">
     <% habits.each do |h| %>
-      <span class="streak-count"><%= calculate_streak(h) %></span>
-      <a href="<%= "/habits/fractal/#{h.id}" %>" class="btn btn-info btn-lg btn-block">Track Habit</a>
+      <div class="streak-count"><h3><%= calculate_streak(h) %></h3></div>
+      <div class="input-group-prepend">
+        <span class="input-group-text"><%= h.name %></span>
+      </div>
+      <span>
+      <a href="<%= "/habits/fractal/#{h.id}" %>" class="btn btn-info btn-block">Track Habit</a>
+      <a href="<%= "/habits/#{h.id}/update" %>" class="btn btn-inverse btn-block">Habit Summary</a>
+      </span>
     <% end %>
   </div>
 
 </div>
-
-<a href="<%= "/habits/#{@habit.id}/update" %>" class="btn btn-warning btn-lg btn-block">Update Objective Details</a>
-<a href="<%= "/habits/fractal/#{habit_ids.join('/')}" %>" class="btn btn-primary btn-lg btn-block">Track Habits Fractally</a>

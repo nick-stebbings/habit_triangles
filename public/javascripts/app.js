@@ -3,6 +3,8 @@
 $(function () {
   /* FlatUI switches*/
   $('[data-toggle="switch"]').bootstrapSwitch();
+  /*Tooltips */
+  $('[data-toggle="tooltip"]').tooltip();
 
   // Toggling a day's 'completed status'
   $("#fractal .bootstrap-switch-label").click(function () {

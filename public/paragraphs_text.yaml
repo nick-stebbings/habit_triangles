@@ -5,14 +5,12 @@
     
     In essence, this is a FRACTAL habit tracker.
 
-    To begin, enter an objective that you would like to pursue, or simply a habit that you would like to form.
-
-  :second: This is the second
+    To begin, describe an objective that you would like to pursue, or simply a habit that you would like to form.
   
-:existing_objective:
-  :new: Here is your chance to make a fresh start in one of your patterns of behavior. If you would like to 
+:objectives:
+  :old: This dashboard allows you to take a quick glance at a list of habits - those linked by objective.
 
-  :old: Track the status of each of the sub-habits.
+  :update: Here you can get an over view of the sub-habits that you have chosen to associate with this objective.
 
 :action_list:
   :intro: >
@@ -30,16 +28,26 @@
     Now let's break it down into smaller pieces. 
 
   :old: >
-    View the progress of your habit(s).
-    
-    If you have decided that a habit needs breaking down further, go to its *Summary* page and set it to **Atomic**.
-
-    Go to the habit's *Objective* page to start stacking habits.
-
-    If the habit is Atomic, click *Tasks* to create a list of simple steps.
+    This is where you can view and adjust the details of your habit. If you have decided this habit is *atomic*, or is about a certain aspect of your life, you can label it so.
 
   :sub_info: >
-    We've given the habit a description, and a tag for the aspect of your life that it covers.
-    Now we want to find out if this is an **atomic** habit, that we could reduce to a list of actions.
+    Give the habit a description, and a tag for the aspect of your life that it covers.
+
+    Now we want to find out if this is an _atomic_ habit, that we could reduce to a list of actions.
 
     Mark with a tick if you've decided if it is _atomic_, then click 'start tracking' to make it a simple list.
+
+  :tooltip_atomic: Once you mark a habit as atomic and click 'Update', you will create an Action list which makes completing the habit each day a breeze!
+
+  :tooltip_completed: Did you do this today?
+
+  :tooltip_streak: Number of days in a row with the habit completed
+
+:fractal:
+  :old: >
+    View the progress of your habit(s).
+    If you have decided that a habit needs breaking down further, go to its *Summary* page and set it to **Atomic**.
+    Go to the habit's *Objective* page to start stacking habits.
+    If the habit is Atomic, click *Tasks* to create a list of simple steps.
+
+  :tooltip_day_toggle: Click to toggle completion of the highlighted day

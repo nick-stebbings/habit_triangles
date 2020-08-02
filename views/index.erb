@@ -2,35 +2,40 @@
   <div class="col">
     <div class="jumbotron m-auto" id="front-page">
       <h1 class='text-center'><%= @page_title %></h1>
-      <span class='text-justify'><%== in_paragraphs(@intro_spiel) %></span>
+        <% if @intro_spiel.include?('invalid') %>
+          <div class="alert alert-warning" role="alert">       
+        <% end %>
+      <div class='text-justify'><%== @intro_spiel %></div>
+        <% if @intro_spiel.include?('invalid') %></div><% end %>
     </div>
   </div>
 </div>
 <div class="row">
   <div class="col">
     <div id="choices" role="tablist">
-      <div role="tab" class="card" id="create_new_objective_card_header">
+      <div role="tab" class="card">
         <div class=" card-header">
           <h3 class="mb-0"><a data-toggle="collapse" href="#new-objective">Set a new objective</a></h3>
         </div>
         <div role="tabpanel" class="collapse show" id="new-objective">
           <div class="card-body">
             <p class="card-text">Input an objective that you would like to strive for. Then we can flesh it out by
-              adding 3 key habits for fulfilling this objective. Please use five words or less, separated by spaces.</p>
+              adding 3 key habits for fulfilling this objective.</p>
             <div class="col">
               <div class="row">
                 <div class="col">
                   <form name="new-objective-form" action="/" method="post">
                     <div class="input-group">
                       <div class="input-group-prepend">
-                        <label class="input-group-text" for="objective_name">Set An Objective</label>
+                        <label class="input-group-text" for="objective-name">Set Objective</label>
                       </div>
                       <div
                         class="<% if @intro_spiel.include?('invalid objective name') %>has-error <% end %>form-group">
                       <input type="text"
                         class="form-control"
                         name="objective_name"
-                      placeholder="Objective description (in 5 words or less)" required />
+                        id="objective-name"
+                      placeholder="Descriptive Name (5 words or less)" required />
                       </div>
                       <div class="input-group-append">
                         <select class="form-control" name="aspect_tag">
@@ -42,18 +47,18 @@
                       </div>
                       <button class="btn btn-success" type="submit" id="create_new_objective_btn">Go!</button>
                     </div>
+                  </form>
                 </div>
-                </form>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div role="tab" class="card" id="create_new_habit_card_header">
+      <div role="tab" class="card">
         <div class="card-header">
           <h3 class="mb-0"><a data-toggle="collapse" href="#new-habit">Start a new habit</a></h3>
         </div>
-        <div role="tabpanel" class="collapse" id="new-habit">
+        <div role="tabpanel" class="<% if !@intro_spiel.include?('invalid') %>collapse<% end %>" id="new-habit">
           <div class="card-body">
             <p class="card-text">Focus on one simple habit by creating it here:</p>
             <div class="col">
@@ -62,13 +67,12 @@
                   <form name="new-habit-form" action="/" method="post">
                     <div class="input-group">
                       <div class="input-group-prepend">
-                        <label class="input-group-text">Start A Habit</label>
+                        <label class="input-group-text" for="habit-description">Start Habit</label>
                       </div>
-                      <div class="form-group<% if @intro_spiel.include?('invalid habit description') %> has-error
-                        <% end %>">
+                      <div class="form-group<% if @intro_spiel.include?('invalid habit description') %> has-error<% end %>">
                       <input
-                        type="text" class="form-control" name="habit_description"
-                        placeholder="Habit description (in 5 words or less)" required />
+                        type="text" class="form-control" name="habit_description" id="habit-description"
+                        placeholder="Description" required />
                       </div>
                       <div class="input-group-append">
                         <select class="form-control" name="aspect_tag">
@@ -87,7 +91,7 @@
           </div>
         </div>
       </div>
-      <div class="card" id="learn_more_card_header">
+      <div class="card">
         <div class="card-header">
           <h3 class="mb-0"><a data-toggle="collapse" href="#learn-more">Learn about habit forming</a></h3>
         </div>
@@ -100,8 +104,8 @@
               </li>
               <li>
                 <a href="https://www.samuelthomasdavies.com/book-summaries/self-help/atomic-habits/" target="_blank">The
-                  Theory Behind Atmomic Habit Forming</a></li>
-              <a class="btn btn-inverse d-flex justify-content-sm-center" href="#">More about what informed the project</a>
+                  Theory Behind Atomic Habit Forming</a></li>
+              <li><a class="btn btn-inverse d-flex justify-content-sm-center" href="#">More about what informed the project</a></li>
             </ul>
           </div>
         </div>

@@ -1,11 +1,10 @@
-<section role="action-list" class="v-flex">
+<section role="list" class="v-flex">
   <header>
-    <div class="input-group side-by-side">
+    <div class="input-group side-by-side h-flex">
       <div class="input-group-prepend"><span class="input-group-text">Habit Name:</span></div>
       <h2><%= @name.split("_").join(" ") %></h2>
       <form action="/habits/<%= @habit_id %>/list/<%= @list_id %>/complete_all" method="post">
-        <button class="btn btn-primary btn-sm" type="submit">Complete Habit for Today
-        </button>
+        <button class="btn btn-primary btn-sm" type="submit">Complete</button>
       </form>
     </div>
   </header>
@@ -22,15 +21,14 @@
           class="delete">
           <button type="submit" class="destroy_btn" id="destroy_btn_<%= idx %>"></button>
           <label for="destroy_btn_<%= idx %>">
-            <div class="todo-icon fui-trash"></div>
+            <span class="todo-icon fui-trash"></span>
           </label>
         </form>
         <div class="todo-content">
-          <h2 class="todo-name">
+          <h2 class="todo-name" role="list-item">
             <%= task[:name] %>
           </h2>
         </div>
-      </li>
 
       <form action="/habits/<%= @habit_id %>/list/<%= @list_id %>/actions/<%= idx %>" method="post" class="check">
         <button class="complete_btn" type="submit" id="complete_btn_<%= idx %>">Complete</button>
@@ -42,16 +40,14 @@
   </div>
 </section>
 <form action="/habits/<%= @habit_id %>/list/<%= @list_id %>/actions" method="post">
-  <div class="input-group side-by-side">
-    <label for="todo">
-      <div class="input-group-prepend"><span class="input-group-text">Add an Action:</span></div>
-    </label>
-
+  <div class="input-group side-by-side h-flex">
+    <div class="input-group-prepend">
+      <label class="input-group-text" for="todo"><span>Add an Action:</span></label>
+    </div>
     <input name="todo" id="todo" class="form-control" placeholder="A tiny step" type="text"
       value="<%= params[:todo] %>">
-
     <fieldset>
       <button class="btn btn-inverse" type="submit">List Action</button>
     </fieldset>
+    </div>
 </form>
-</section>

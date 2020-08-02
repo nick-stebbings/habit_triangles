@@ -1,59 +1,68 @@
 <form action="<%= "/habits/#{@habit.id}/update" %>" method="post">
-    <fieldset>
-        <div class="input-group side-by-side">
-            <div class="input-group-prepend"><span class="input-group-text">Description</span></div>
-            <input type="text" class="form-control" name="habit_description" value="<%= @habit.description %>"
-                placeholder="Describe the behaviour" required
-                id="habit-description">
-            <label class="fui-new" for="habit-description"></label>
+  <fieldset>
+    <div class="input-group side-by-side">
+      <div class="input-group-prepend"><span class="input-group-text"><label
+            for="habit-description">Description</label></span></div>
+      <div class="form-group<% if (@error && @error.include?('description')) %> has-error<% end %>">
+        <input type="text" class="form-control" name="habit_description" value="<%= @habit.description %>"
+          placeholder="Describe the behaviour" required id="habit-description">
+      </div>
+      <label class="fui-new" for="habit-description"></label>
+    </div>
+
+    <div class="input-group side-by-side">
+      <div class="input-group-prepend"><span class="input-group-text"><label for="habit-aspect">Aspect</label></span>
+      </div>
+      <div class="form-group<% if (@error && @error.include?('tag')) %> has-error<% end %>">
+        <input type="text" class="form-control" name="aspect_tag" value="<%= @habit.aspect %>"
+          placeholder="#use-this-tag-format" required id="habit-aspect">
+      </div>
+      <label class="fui-tag" for="habit-aspect"></label>
+    </div>
+
+    <div class="input-group side-by-side">
+      <div class="input-group-prepend"><span class="input-group-text"><label for="habit-start-date">Start
+            Date</label></span></div>
+      <div class="form-group<% if (@error && @error.include?('date')) %> has-error<% end %>">
+        <input type="date" class="form-control" name="date_of_initiation"
+          value="<%= @habit.date_of_initiation.strftime('%Y-%m-%d') %>" id="habit-start-date">
+      </div>
+      <label class="fui-calendar" for="habit-start-date"></label>
+    </div>
+  </fieldset>
+  <fieldset class="h-flex">
+    <div class="input-group side-by-side">
+      <div class="v-flex">
+        <div class="input-group-prepend atomic" data-toggle="tooltip" data-placement="left"
+          title="<%= TEXT[:existing_habit][:tooltip_atomic] %>">
+          <span class="input-group-text"><label for="is-atomic">Atomic?</label></span>
         </div>
 
-        <div class="input-group side-by-side">
-            <div class="input-group-prepend"><span class="input-group-text">Aspect</span></div>
-            <input type="text" class="form-control" name="aspect_tag" value="<%= @habit.aspect %>"
-                placeholder="#use-this-tag-format" required
-                id="habit-aspect">
-            <label class="fui-tag" for="habit-aspect"></label>
+        <div class="bootstrap-switch-square">
+          <input name="is_atomic" id="is-atomic" type="checkbox" data-toggle="switch"
+            data-on-text="<i class='fui-check'></i>" data-off-text="<i class='fui-cross'></i>"
+            <%= if @habit.is_atomic then "checked" end %> />
         </div>
+      </div>
 
-        <div class="input-group side-by-side">
-            <div class="input-group-prepend"><span class="input-group-text">Initiation Date</span></div>
-            <input type="date" class="form-control" name="date_of_initiation"
-                value="<%= @habit.date_of_initiation.strftime('%Y-%m-%d') %>" id="habit-start-date">
-            <label class="fui-calendar" for="habit-start-date"></label>
-        </div>
-    </fieldset>
-    <fieldset class="h-flex">
-        <div class="input-group side-by-side">
-            <div class="v-flex">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Atomic?</span>
-                </div>
-
-                <div class="bootstrap-switch-square">
-                    <input name="is_atomic" id="is_atomic" type="checkbox" data-toggle="switch"
-                        data-on-text="<i class='fui-check'></i>" data-off-text="<i class='fui-cross'></i>"
-                        <%= if @habit.is_atomic then "checked" end %> />
-                </div>
-            </div>
-
-            <button class="btn btn-inverse" type="submit">Update Habit Details</button>
-            <button class="btn btn-danger" formaction="<%= "/habits/#{@habit.id}/delete" %>">Delete This
-                Habit</button>
-        </div>
-    </fieldset>
+      <button class="btn btn-inverse" type="submit">Update</button>
+      <button class="btn btn-danger" formaction="<%= "/habits/#{@habit.id}/delete" %>">Delete</button>
+    </div>
+  </fieldset>
 
 </form>
 
 <div class="h-flex">
-    <div class="card-header">Today?</div>
-    <div class="card-body">
-        <div class="tick-box <%= @habit.head_node.today == 't' ? 'fui-check' : 'fui-cross' %>"></div>
-    </div>
-    <div class="card-header">Streak:</div>
-    <div class="card-body">
-        <span class="streak-count"><%= calculate_streak(@habit) %></span>
-    </div>
+  <div class="card-header" data-toggle="tooltip" data-placement="bottom"
+    title="<%= TEXT[:existing_habit][:tooltip_completed] %>">Today?</div>
+  <div class="card-body">
+    <div class="tick-box <%= @habit.head_node.today == 't' ? 'fui-check' : 'fui-cross' %>"></div>
+  </div>
+  <div class="card-header" data-toggle="tooltip" data-placement="bottom"
+    title="<%= TEXT[:existing_habit][:tooltip_streak] %>">Streak:</div>
+  <div class="card-body">
+    <span class="streak-count"><%= calculate_streak(@habit) %></span>
+  </div>
 
-    <a href="<%= "/habits/fractal/#{@habit.id}" %>" class="btn btn-primary btn-lg btn-block">Track Habit</a>
+  <a href="<%= "/habits/fractal/#{@habit.id}" %>" class="btn btn-primary btn-lg btn-block">Start Tracking</a>
 </div>

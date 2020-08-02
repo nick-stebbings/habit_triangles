@@ -14,11 +14,12 @@ ROOT = File.expand_path('..', __FILE__)
 TEXT = YAML.load_file(ROOT + '/public/paragraphs_text.yaml')
 
 MESSAGES = {
-  invalid_objective_name: "You entered an invalid objective name. Please try to summarise in up to 5 words, split with spaces.",
+  invalid_objective_name: "You entered an invalid objective name. Please try to summarise in up to 5 words, separated by spaces.",
   invalid_habit_name: "You entered an invalid habit name. Please try to summarise in up to 5 words, split with spaces.",
   invalid_habit_description: "You entered an invalid habit description. Please limit it to 50 characters or less.",
   invalid_date_of_initiation: "You entered an invalid date, it is in the future!",
-  invalid_aspect_tag: "You entered an invalid tag. The format should be #this-is-a-tag"
+  invalid_aspect_tag: "You entered an invalid tag. The format should be #this-is-a-tag",
+  invalid_task_description: "The task description must be between 1 and 100 characters"
 }
 
 def set_session_variables
@@ -49,20 +50,38 @@ helpers do
   end
 
   def get_task_list(habit_id, habit_list_id)
-    session[:lists].find { |l| (l[:habit_id] = habit_id) && (l[:habit_list_id] == habit_list_id) }
+    session[:lists].find { |l| (l[:habit_id] == habit_id) && (l[:habit_list_id] == habit_list_id) }
   end
 
-  def incomplete_tasks(habit_id, habit_list_id)
+  def get_objective_key_by_habit(id)
+    session[:objectives].each { |objective_name, objective| return objective_name if objective.habits.find { |habit| habit.id == id } }
+    nil
+  end
+
+  def get_last_task_list_for_habit(habit_id)
+    all_lists_for_habit = session[:lists].select do |list|
+      list[:habit_id] == habit_id
+    end
+    all_lists_for_habit.max_by { |l| l[:habit_list_id] }
+  end
+
+  def number_of_incomplete_tasks(habit_id, habit_list_id)
     get_task_list(habit_id, habit_list_id)[:todos].reject { |task| task[:completed] }.size
   end
 
-  # After checking if a list is in a completed state, redirect accordingly
+  # Redirect accordingly after checking list completed state
   def completed_list_redirection(habit_id, habit_list_id)
-    new_url_string = "/list/#{habits_last_list(habit_id)[:habit_list_id]}/complete_all"
-    incomplete_tasks(habit_id, habit_list_id).zero? ? new_url_string : ""
+    new_url_string = "/list/#{get_last_task_list_for_habit(habit_id)[:habit_list_id]}/complete_all"
+    number_of_incomplete_tasks(habit_id, habit_list_id).zero? ? new_url_string : ""
   end
 
-  def reset_list!(list)
+  def mark_all_tasks_completed!(list)
+    list[:todos].each do |task|
+      task[:completed] = true
+    end
+  end
+
+  def reset_list_status!(list)
     list[:todos].each { |t| t[:completed] = false }
   end
 
@@ -73,13 +92,6 @@ helpers do
     incomplete.each{ |task| yield(task, list.index(task)) }
     complete.each{ |task| yield(task, list.index(task)) }
   end
-
-  # Return an error message if the Todo is invalid, otherwise return nil.
-  def error_for_todo(text)
-    if !(1..100).cover? text.size   
-      "The task must be between 1 and 100 characters"
-    end
-  end
 end
 
 configure do
@@ -87,14 +99,6 @@ configure do
   set :session_secret, 'habit'
   set :erb, :escape_html => true
   also_reload "paragraphs_text.yaml" if development?
-end
-
-
-def habits_last_list(habit_id)
-  all_lists_for_habit = session[:lists].select do |list|
-    list[:habit_id] == habit_id
-  end
-  all_lists_for_habit.max_by { |l| l[:habit_list_id] }
 end
 
 def valid_objective_name?(phrase)
@@ -113,10 +117,10 @@ def valid_aspect?(tag)
   tag.match? %r{^#(?:\w*-){0,8}\w+$} # Matches #this-is-a-tag format with at most 8 dashes
 end
 
-def get_objective_key_by_habit(id)
-  session[:objectives].each { |objective_name, objective| return objective_name if objective.habits.find { |habit| habit.id == id } }
-  nil
-end
+  # Return an error message if the Todo is invalid, otherwise return nil.
+  def error_for_todo(text)
+    MESSAGES[:invalid_task_description] if !(1..100).cover?(text.size)
+  end
 
 def list_exists?(habit_id, h_list_id)
   session[:lists].any? { |l| l[:habit_id] == habit_id && l[:habit_list_id] == h_list_id}
@@ -137,7 +141,7 @@ def calculate_streak(habit)
   count
 end
 
-def instantiate_3_habits(objective_name)
+def instantiate_3_habits_in_array(objective_name)
   Array.new(3) do |i|
     habit_id = get_next_id(:habit) + i
     habit_name = objective_name + "_cornerstone_#{i}"
@@ -169,6 +173,8 @@ end
 
 before do
   set_session_variables
+  @intro_spiel ||= ''
+  @page_title ||= 'Happy Habit Triangles'
 end
 
 not_found do
@@ -179,7 +185,7 @@ end
 
 error do
   @page_title = "Error"
-  @intro_spiel = "An error occurred."
+  @intro_spiel = "An error occurred. #{session[:message]}"
   erb :error, :layout => :simple_layout
 end
 
@@ -193,51 +199,49 @@ post "/" do
   # Process front page choice of new objective or new habit
   # We pass a query parameter to indicate first app use to lead the user through
 
-  first_habit = nil
+  @habit = nil
   user_input_objective = params[:objective_name]
   user_input_habit = params[:habit_description]
   case
   when valid_input(user_input_objective, :obj)
     # Once a valid objective name has been entered, convert it to a label to use as a hash key in session[:objectives]
     objective_identifier = make_identifier(user_input_objective)
-    habits_ary = instantiate_3_habits(objective_identifier)
+    habits_ary = instantiate_3_habits_in_array(objective_identifier)
 
     # Add new objects to the session
     session[:objectives][objective_identifier] = Objective.new(get_next_id(:objective), habits_ary, objective_identifier)
     habits_ary.each { |h| session[:habits] << h }
-
-    first_habit = habits_ary.first
+    @habit = habits_ary.first
   when valid_input(user_input_habit, :habit)
-    first_habit = Habit.new(get_next_id(:habit), make_identifier(user_input_habit), aspect: params[:aspect_tag])
-    session[:habits] << first_habit
+    @habit = Habit.new(get_next_id(:habit), make_identifier(user_input_habit), description: user_input_habit, aspect: params[:aspect_tag])
+    session[:habits] << @habit
   when user_input_habit && !valid_input(user_input_habit, :habit) || user_input_objective && !valid_input(user_input_objective, :obj)
     session[:message] = user_input_objective ? MESSAGES[:invalid_objective_name] : (MESSAGES[:invalid_habit_description] if user_input_habit)
     @intro_spiel = session[:message]
-    @page_title = 'Error: 422'
+    @page_title = 'Input Error'
     halt 422, erb(:index)
   end
   session[:message] = nil 
-  redirect "/habits/#{first_habit.id}/update?initial=true"
+  redirect "/habits/#{@habit.id}/update?initial=true"
 end
 
 ## Objectives Routes
 get "/objectives/:id/update" do |id|
   @objective = get_objective(id.to_i)
   @habits = @objective.habits
-
-  @page_tite = "Objective Summary"
-  @intro_spiel = "This dashboard allows you to take a quick glance at a list of habits - those linked by objective or all habits in the system."
+  @page_title = "Objective Summary"
+  @intro_spiel = TEXT[:objectives][:update]
   @sub_info = "This is a list of habits for the objective named <b>#{@objective.name}</b>."
   
-  erb :update_objective, :layout => :layout
+  erb :existing_objective, :layout => :simple_layout
 end
 
 get "/objectives/:id" do |id|
   @objective = get_objective(id.to_i)
 
-  @page_tite = "List of Habits By Objective"
-  @intro_spiel = "This dashboard allows you to take a quick glance at a list of habits - those linked by objective or all habits in the system."
-  @sub_info = "This is a list of habits for the objective named <b>#{@objective.name}</b>."
+  @page_title = "List of Habits By Objective"
+  @intro_spiel = TEXT[:objectives][:old]
+  @sub_info = "This is a list of habits for the objective named <h4>#{@objective.name}</h4>."
   erb :index_habits, :layout => :simple_layout
 end
 
@@ -257,18 +261,17 @@ get "/habits" do
 end
 
 get "/habits/:id" do |id|
-  @habits = [get_habit(id.to_i)]
-  halt 404 unless @habits
-
+  @habit = get_habit(id.to_i)
+  halt 404 unless @habit
   @page_title = "Habit Overview"
-  @intro_spiel = "This is the summary information for your habit with identifier <b>#{@habits.first.name}.</b>"
-  erb :index_habits, :layout => :simple_layout
+  @intro_spiel = "This is the summary information for your habit with identifier <b>#{@habit.name}.</b>" +
+  render_markdown(TEXT[:existing_habit][:sub_info])
+  erb :update_habit, :layout => :simple_layout
 end
 
 get "/habits/:id/update" do |id|
   @habit = get_habit(id.to_i)
-  
-  @intro_spiel = params[:initial] ? TEXT[:existing_habit][:new] : 'This is just an old habit.'
+  @intro_spiel = params[:initial] ? TEXT[:existing_habit][:new] : TEXT[:existing_habit][:old]
   @sub_info = render_markdown(TEXT[:existing_habit][:sub_info])
   @page_title = "Update Habit Summary"
   erb :update_habit, :layout => :simple_layout
@@ -290,8 +293,10 @@ post "/habits/:id/update" do |id|
   session[:message] = MESSAGES[:invalid_date_of_initiation] unless valid_date?(date)
 
   if session[:message]
+    @error = session[:message]
     halt erb :update_habit, :layout => :simple_layout 
   else
+    binding.pry
     @habit.description = params[:habit_description].strip
     @habit.date_of_initiation = date
     @habit.aspect = params[:aspect_tag].strip
@@ -299,19 +304,18 @@ post "/habits/:id/update" do |id|
     @habit.update_to_today! 
     list_id = @habit.length - 1
     
-    if @habit.is_atomic && !list_exists?(id, list_id)
+    if @habit.is_atomic && !list_exists?(id.to_i, list_id)
       @intro_spiel = "This is some action list intro."
       
-      last_list = habits_last_list(id.to_i)
-      
+      last_list = get_last_task_list_for_habit(id.to_i)
       last_todos = last_list[:todos] unless last_list.nil?
       new_list_duplicate = { habit_id: id.to_i, todos: (last_todos || []), habit_list_id: (!last_list ? 0 : list_id) }
-      reset_list!(new_list_duplicate)
+      reset_list_status!(new_list_duplicate)
       session[:lists] << new_list_duplicate unless list_exists?(id.to_i, list_id)
       redirect "/habits/#{id}/list/#{new_list_duplicate[:habit_list_id]}" 
     end
   end
-  redirect "/habits/#{id}"
+  redirect "/habits/fractal/#{id}"
 end
 
 post "/habits/:id/delete" do |id|
@@ -325,11 +329,14 @@ end
 get /\/habits\/fractal((\/(?:\d{1,})){1,})/ do
   # Split habit_id parameters into an array of integers
   habits_in_chain = params['captures'].first.split("/")[1..-1].map(&:to_i)
-
+  
   @habits = habits_in_chain
-    .map { |id| get_habit(id) }
-    .sort_by(&:length).reverse
-    .each { |h| h.update_to_today! }
+  .map { |id| get_habit(id) }
+  .sort_by(&:length).reverse
+  .each { |h| h.update_to_today! }
+  unless (@habits.all? {|h| session[:habits].include?(h)})
+    halt 404
+  end
 
   @base_habit = @habits.first
   @length_of_longest_habit = @base_habit.length
@@ -357,9 +364,13 @@ end
 ## Todo List Modular Routes
 # View a list
 get "/habits/:habit_id/list/:list_id" do |habit_id, list_id|
-  @page_title = "View Habit Actions"
   @habit_id = habit_id.to_i
   @list_id = list_id.to_i
+  @page_title = "View Habit Actions"
+  unless list_exists?(@habit_id, @list_id)
+    session[:message] = 'List does not exist!'
+    halt 404
+  end
   @name = get_habit(habit_id.to_i).name
   @list = get_task_list(@habit_id, @list_id)
 
@@ -374,9 +385,7 @@ post "/habits/:habit_id/list/:list_id/complete_all" do |habit_id, list_id|
   @list_id = list_id.to_i
   @list = get_task_list(@habit_id, @list_id)
 
-  @list[:todos].each do |task|
-    task[:completed] = true
-  end
+  mark_all_tasks_completed!(@list)
   length_of_habit = get_habit(@habit_id).length
   update_habit_after_list_completed!(@habit_id, length_of_habit - @list_id - 1)
   session[:message] = 'List marked as complete.'
@@ -404,11 +413,13 @@ post "/habits/:habit_id/list/:list_id/actions" do |habit_id, list_id|
   @list_id = list_id.to_i
   @list = get_task_list(@habit_id, @list_id)
   todo_text = params[:todo].strip
+  @name = get_habit(habit_id.to_i).name
 
   error = error_for_todo(todo_text)
   if error
     session[:message] = error
-    erb :list, layout: :list_layout
+    @page_title = 'Invalid Input'
+    halt 422, erb(:list, :layout => :list_layout)
   else
     @list[:todos] << { name: todo_text, completed: false }
     session[:message] = "The task has been added."  

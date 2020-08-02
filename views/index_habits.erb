@@ -1,60 +1,54 @@
+<% if !@objective.nil? %>
+<a href="<%= "/objectives/#{@objective.id}/update" %>" class="btn btn-info btn-lg btn-block">Update Objective
+  Summary</a>
+<% end %>
 
-          <% if !@objective.nil? %>
-          <a href="<%= "/objectives/#{@objective.id}/update" %>" class="btn btn-info btn-lg btn-block">Update Objective
-            Summary</a>
-          <% end %>
+<% collection = @objective.nil? ? @habits : @objective.habits %>
+<% collection.each_with_index do |habit, idx| %>
 
-          <% collection = @objective.nil? ? @habits : @objective.habits %>
-          <% collection.each_with_index do |habit, idx| %>
-  
-            <div class="row">
-              <div class="col">
-                <div class="table-responsive">
-                  <table class="table">
-                    <thead>
-                      <tr>
-                        <th>Habit: <%== habit.name %></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>
-                          Description
-                        </td>
-                        <td>
-                          <%= habit.description %>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          Aspect
-                        </td>
-                        <td>
-                          <%= habit.aspect %>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          Update Details
-                        </td>
-                        <td>
-                          <a href="<%= "/habits/#{habit.id}/update" %>" class="btn btn-warning btn-lg btn-block">Update Habit Summary</a>
-                          <a href="<%= "/habits/fractal/#{habit.id}" %>" class="btn btn-primary btn-lg btn-block">Track
-                            Habit</a>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-
-            <% end %>
-          </div>
-
-        </div>
-      </div>
-    </div>
+<div class="row">
+  <div class="col">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th><span>Habit:</span></th>
+            <td>
+              <h4><%== habit.name %></h4>
+            </td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              Description
+            </td>
+            <td>
+              <%= habit.description %>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Aspect
+            </td>
+            <td>
+              <%= habit.aspect %>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Update Details
+            </td>
+            <td>
+              <a href="<%= "/habits/#{habit.id}/update" %>" class="btn btn-warning btn-lg btn-block">Update Habit
+                Summary</a>
+              <a href="<%= "/habits/fractal/#{habit.id}" %>" class="btn btn-primary btn-lg btn-block">Track
+                Habit</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
+<% end %>
