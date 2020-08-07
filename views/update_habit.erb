@@ -14,7 +14,7 @@
       <div class="input-group-prepend"><span class="input-group-text"><label for="habit-aspect">Aspect</label></span>
       </div>
       <div class="form-group<% if (@error && @error.include?('tag')) %> has-error<% end %>">
-        <input type="text" class="form-control" name="aspect_tag" value="<%= @habit.aspect %>"
+        <input type="text" class="form-control" name="aspect_tag" value="<%= @habit.aspect || '#' %>"
           placeholder="#use-this-tag-format" required id="habit-aspect">
       </div>
       <label class="fui-tag" for="habit-aspect"></label>
@@ -47,6 +47,7 @@
 
       <button class="btn btn-inverse" type="submit">Update</button>
       <button class="btn btn-danger" formaction="<%= "/habits/#{@habit.id}/delete" %>">Delete</button>
+      <label class="fui-trash"></label>
     </div>
   </fieldset>
 
@@ -61,7 +62,7 @@
   <div class="card-header" data-toggle="tooltip" data-placement="bottom"
     title="<%= TEXT[:existing_habit][:tooltip_streak] %>">Streak:</div>
   <div class="card-body">
-    <span class="streak-count"><%= calculate_streak(@habit) %></span>
+    <span><%= calculate_streak(@habit) %></span>
   </div>
 
   <a href="<%= "/habits/fractal/#{@habit.id}" %>" class="btn btn-primary btn-lg btn-block">Start Tracking</a>

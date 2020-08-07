@@ -50,7 +50,7 @@
                     <a class="btn btn-inverse"
                       href="/habits/<%= @base_habit.id %>/list/<%= get_last_task_list_for_habit(@base_habit.id)[:habit_list_id] %>">Tasks</a>
                     <% end %>
-                    <a class="btn btn-inverse" href="/habits/<%= @base_habit.id %>/update">Summary</a>
+                    <a class="btn btn-secondary" href="/habits/<%= @base_habit.id %>/update">Summary</a>
                     <div class="bootstrap-switch-square" data-toggle="tooltip" data-placement="right"
                       title="<%= TEXT[:fractal][:tooltip_day_toggle] %>">
                       <input name="completed-day-<%= idx %>" id="completed-day-<%= idx %>" type="checkbox"
@@ -67,7 +67,7 @@
             <div class="swiper-button-prev fui-arrow-left"></div>
 
             <div class="swiper-pagination-wrapper">
-              <div class="swiper-pagination h-flex"></div>
+              <div class="d-flex flex-wrap-reverse swiper-pagination h-flex"></div>
             </div><!-- end swiper wrapper -->
           </div><!-- end swiper container -->
         </form>

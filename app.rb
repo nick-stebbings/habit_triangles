@@ -160,6 +160,10 @@ end
     text.split("\n").map { |para| "<p>#{para}</p>" }.join
   end
 
+  def split_and_cap(str)
+    str.split('_').map(&:capitalize).join(' ')
+  end
+
   def make_identifier(phrase)
     phrase.downcase.split(' ').join('_').strip
   end
@@ -169,6 +173,22 @@ end
     renderer.render(text)
   end
 
+  def set_session_message!
+    session[:message] = MESSAGES[:invalid_habit_description] unless valid_habit_description?(params[:habit_description])
+    session[:message] = MESSAGES[:invalid_aspect_tag] unless valid_aspect?(params[:aspect_tag])
+    date = DateTime.parse(params[:date_of_initiation]).new_offset if params[:date_of_initiation]
+    session[:message] = MESSAGES[:invalid_date_of_initiation] unless valid_date?(date)
+  end
+
+  def set_attributes_for_habit!(habit)
+    date = DateTime.parse(params[:date_of_initiation]).new_offset if params[:date_of_initiation]
+    
+    habit.description = params[:habit_description].strip
+    habit.date_of_initiation = date
+    habit.aspect = params[:aspect_tag].strip
+    habit.is_atomic = (params[:is_atomic] == 'on')
+    habit.update_to_today! 
+  end
 # end
 
 before do
@@ -231,9 +251,9 @@ get "/objectives/:id/update" do |id|
   @habits = @objective.habits
   @page_title = "Objective Summary"
   @intro_spiel = TEXT[:objectives][:update]
-  @sub_info = "This is a list of habits for the objective named <b>#{@objective.name}</b>."
+  @sub_info = "This is a list of habits for the objective named <h4>#{split_and_cap(@objective.name)}</h4>."
   
-  erb :existing_objective, :layout => :simple_layout
+  erb :update_objective, :layout => :simple_layout
 end
 
 get "/objectives/:id" do |id|
@@ -241,7 +261,7 @@ get "/objectives/:id" do |id|
 
   @page_title = "List of Habits By Objective"
   @intro_spiel = TEXT[:objectives][:old]
-  @sub_info = "This is a list of habits for the objective named <h4>#{@objective.name}</h4>."
+  @sub_info = "This is a list of habits for the objective named <h4>#{split_and_cap(@objective.name)}</h4>."
   erb :index_habits, :layout => :simple_layout
 end
 
@@ -286,22 +306,13 @@ post "/habits/:id/update" do |id|
   @intro_spiel = params[:initial] ? TEXT[:existing_habit][:new] : TEXT[:existing_habit][:old]
   @sub_info = render_markdown(TEXT[:existing_habit][:sub_info]) 
   @page_title = "Update Habit Summary"
-
-  session[:message] = MESSAGES[:invalid_habit_description] unless valid_habit_description?(params[:habit_description])
-  session[:message] = MESSAGES[:invalid_aspect_tag] unless valid_aspect?(params[:aspect_tag])
-  date = DateTime.parse(params[:date_of_initiation]).new_offset if params[:date_of_initiation]
-  session[:message] = MESSAGES[:invalid_date_of_initiation] unless valid_date?(date)
-
+  
+  set_session_message!
   if session[:message]
     @error = session[:message]
     halt erb :update_habit, :layout => :simple_layout 
   else
-    binding.pry
-    @habit.description = params[:habit_description].strip
-    @habit.date_of_initiation = date
-    @habit.aspect = params[:aspect_tag].strip
-    @habit.is_atomic = (params[:is_atomic] == 'on')
-    @habit.update_to_today! 
+    set_attributes_for_habit!(@habit)
     list_id = @habit.length - 1
     
     if @habit.is_atomic && !list_exists?(id.to_i, list_id)
@@ -320,9 +331,9 @@ end
 
 post "/habits/:id/delete" do |id|
   objective = session[:objectives][get_objective_key_by_habit(id.to_i)]
-  objective.habits.delete_if { |habit| habit.id == id.to_i}
+  objective.habits.delete_if { |habit| habit.id == id.to_i} if objective
   session[:habits].delete_if { |habit| habit.id == id.to_i }
-  redirect "/objectives/#{objective.id}"
+  redirect !!objective ? "/objectives/#{objective.id}" : "/"
 end
 
 ## Fractal Habit Triangle
@@ -376,7 +387,7 @@ get "/habits/:habit_id/list/:list_id" do |habit_id, list_id|
 
   @intro_spiel = render_markdown( TEXT[:action_list][:intro] )
   
-  erb :list, :layout => :list_layout
+  erb :list, :layout => :simple_layout
 end
 
 # Complete all tasks on a list
@@ -419,7 +430,7 @@ post "/habits/:habit_id/list/:list_id/actions" do |habit_id, list_id|
   if error
     session[:message] = error
     @page_title = 'Invalid Input'
-    halt 422, erb(:list, :layout => :list_layout)
+    halt 422, erb(:list, :layout => :simple_layout)
   else
     @list[:todos] << { name: todo_text, completed: false }
     session[:message] = "The task has been added."  

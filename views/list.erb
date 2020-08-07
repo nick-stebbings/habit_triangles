@@ -2,9 +2,13 @@
   <header>
     <div class="input-group side-by-side h-flex">
       <div class="input-group-prepend"><span class="input-group-text">Habit Name:</span></div>
-      <h2><%= @name.split("_").join(" ") %></h2>
+      <h2><%= split_and_cap(@name) %></h2>
       <form action="/habits/<%= @habit_id %>/list/<%= @list_id %>/complete_all" method="post">
-        <button class="btn btn-primary btn-sm" type="submit">Complete</button>
+      <div class="btn-block h-flex">
+        <a class="btn btn-warning" href="/habits/<%= @habit_id %>/update">Habit Details</a>
+        <a class="btn btn-secondary" href="/habits/fractal/<%= @habit_id %>">Track Habit</a>
+        <button class="btn btn-primary btn-sm" type="submit">Complete Day</button>
+      </div>
       </form>
     </div>
   </header>
