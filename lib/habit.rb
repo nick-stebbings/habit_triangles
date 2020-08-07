@@ -21,10 +21,8 @@ module NodeOperations
   end
   
   def each_node_completed?
-    current_node = head_node
-    while current_node
-      yield(current_node.today)
-      current_node = current_node.yest
+    head_node.each do |current_node|
+      yield(current_node.today)  
     end
     head_node
   end
@@ -75,7 +73,7 @@ class Habit
   def each
     current_node = head_node
     while current_node
-      yield(current_node)
+      yield(current_node) if block_given?
       current_node = current_node.yest
     end
     head_node

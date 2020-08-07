@@ -25,9 +25,6 @@ $(function () {
         baseLength
     )}, 50);
   });
-  // let scaleFactor =
-  //   baseLength < Triangle.BASE_ROW_WRAP_LENGTH; // not sure yet..
-
     Triangle.formatPyramid(
       scaleFactor,
       Triangle.BASE_ROW_WRAP_LENGTH,

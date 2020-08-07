@@ -12,8 +12,7 @@ $(function () {
     // Toggle the boolean representation of 'day completed' in string (t/f)
     let toggledValue = currentDataName.slice(-1) === "t" ? "f" : "t";
     let newDataName = currentDataName.slice(0, -1) + toggledValue;
-    
-    let nodeInfo = newDataName[2]; // This is the node that needs to be altered
+    let nodeInfo = newDataName.split('-')[1]; // This is the node that needs to be altered
     $(this).closest(".swiper-slide").attr("data-name", newDataName); // Now it is toggled, reset the data for the slide
     
     // Pass the node identifier to the backend via a hidden form element
@@ -41,7 +40,7 @@ $(function () {
     event.preventDefault();
     event.stopPropagation();
     var thisForm = $(this).closest("form");
-    var ok = confirm("Are you sure? This deletes the whole habit!");
+    var ok = confirm("Are you sure? This deletes the item!");
     if (ok) {
       thisForm.attr('action', $(this).attr('formaction'));
       thisForm.submit();;
