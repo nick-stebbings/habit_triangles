@@ -16,16 +16,22 @@ const waitForFinalEvent = (function () {
 
 $(function () {
   let baseLength = Triangle.swiperInstances[0].slides.length;
-  $(window).resize(function (event) {
-    Triangle.formatPyramid(
-      Triangle.BASE_ROW_WRAP_LENGTH,
-      baseLength
-    );
+  let scaleFactor = 1 + 1 / Triangle.baseRowPositiveSpace();
+  $(window).resize(function () {
+    waitForFinalEvent(function(){
+      Triangle.formatPyramid(
+        scaleFactor,
+        Triangle.BASE_ROW_WRAP_LENGTH,
+        baseLength
+    )}, 50);
   });
-  let scaleFactor =
-    baseLength < Triangle.BASE_ROW_WRAP_LENGTH; // not sure yet..
+  // let scaleFactor =
+  //   baseLength < Triangle.BASE_ROW_WRAP_LENGTH; // not sure yet..
+
     Triangle.formatPyramid(
+      scaleFactor,
       Triangle.BASE_ROW_WRAP_LENGTH,
       baseLength
     );
+    Triangle.swiperInstances[0].slideTo(baseLength);
 });

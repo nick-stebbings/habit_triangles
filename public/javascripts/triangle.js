@@ -1,7 +1,5 @@
-
-
-const TRIANGLE_SCALE_FACTOR = 12;
-const BASE_ROW_WRAP_LENGTH = 9;
+const TRIANGLE_SCALE_FACTOR = 18;
+const BASE_ROW_WRAP_LENGTH = 15;
 var swiperInstances = [];
 
 jQuery.fn.reverse = [].reverse;
@@ -38,8 +36,10 @@ $(".swiper-container").each(function (index, element) {
       pagination: "#triangles-" + index,
       // Custom pagination rendering for triangles interface
       paginationBulletRender: function (index, className) {
-        var currentSlide = $("." + this.wrapperClass).find(".swiper-slide").reverse()[
-          index
+        var slides = $("." + this.wrapperClass).find(".swiper-slide");
+        var len = slides.length;
+        var currentSlide = slides.reverse()[
+          len - index - 1
         ];
         var dayCompletedClass =
         $(currentSlide).attr("data-name").slice(-1) == "t"
@@ -59,10 +59,9 @@ $(".swiper-container").each(function (index, element) {
     swiperInstances.push(newSwiper);
   });
 
-const widestBaseRowPossible = function() {
-  Math.floor(swiperInstances[0].length / 3);
-  console.log('sil' , swiperInstances[0].length);
-};
+// const widestBaseRowPossible = function() {
+//   Math.floor(swiperInstances[0].length / 3);
+// };
 
 // Adds flex-break divs to break up triangles into flex-row containers
 const addFlexBreakOnFlexWrap = function () {
@@ -81,26 +80,18 @@ const addFlexBreakOnFlexWrap = function () {
 };
 
 const addFlexBreakAfterNthTriangle = function (n, totalTriangles) {
-  let flexBreaksRequired = Math.floor(totalTriangles / n);
+  let flexBreaksRequired = Math.floor(totalTriangles / n*2);
   let nextElement = n;
   for (let i = 1; i <= flexBreaksRequired; i++) {
     let nthTrianglesSelector = `#fractal .triangle-wrapper:nth-of-type(${nextElement})`; // The break comes one triangle earlier for each row
     $(nthTrianglesSelector).after("<div class='flex-break custom-wrap'></div>");
-    n--;
+    n -= 2;
     nextElement += n;
   }
 };
 
-const rowNeedsWrapping = function (rowLength) {
-  console.log("width", $(`#triangles-0`).width());
-  console.log("brps", baseRowPositiveSpace(), 'rLength', rowLength);
-  console.log('wbrp' , widestBaseRowPossible());
-  return baseRowPositiveSpace() < rowLength * 2 - 1;
-};
-
 const styleInvertedTriangles = function (habitIndex, flexRowIndex) {
-  let oddTrianglesSelector = `#triangles-${habitIndex} .flex-row-${flexRowIndex}.triangle-wrapper:nth-of-type(2n + 2) span.triangle`;
-
+  let oddTrianglesSelector = `#triangles-${habitIndex} .flex-row-${flexRowIndex}.triangle-wrapper:nth-of-type(2n + ${flexRowIndex + 2} ) span.triangle`;
   // Add styling for inverted triangles
   $(`#triangles-${habitIndex} span.triangle-wrapper`).addClass("tessellated");
   $(oddTrianglesSelector).each(function (_, element) {
@@ -116,8 +107,9 @@ const styleInvertedTriangles = function (habitIndex, flexRowIndex) {
   });
 };
 
-const scaleTriangles = function (rowLimit = BASE_ROW_WRAP_LENGTH) {
-  let triangleWidth = TRIANGLE_SCALE_FACTOR * (1 / rowLimit).toFixed(3);
+const scaleTriangles = function (scaleFactor, rowLimit = BASE_ROW_WRAP_LENGTH) {
+  let triangleWidth =
+    scaleFactor * TRIANGLE_SCALE_FACTOR * (1 / rowLimit).toFixed(3);
   $("#fractal .swiper-pagination").css("font-size", `${triangleWidth}vh`);
 };
 
@@ -145,30 +137,30 @@ const wrapFlexRows = function (numRows, swiperId) {
   }
 };
 
-const addFlexRowPadding = function (rowIndex) {
-  let lastRowPadding;
-  let workingFontSize = parseFloat($(`#triangles-0`).css("font-size"), 10);
-  if (rowIndex === 1) {
-    lastRowPadding = 1;
-  } else {
-    lastRowPadding = $(`#triangles-${rowIndex} .flex-break`).css("font-size");
-  }
-  return lastRowPadding - workingTriangleWidth();
-};
+// const addFlexRowPadding = function (rowIndex) {
+//   let lastRowPadding;
+//   let workingFontSize = parseFloat($(`#triangles-0`).css("font-size"), 10);
+//   if (rowIndex === 1) {
+//     lastRowPadding = 1;
+//   } else {
+//     lastRowPadding = $(`#triangles-${rowIndex} .flex-break`).css("font-size");
+//   }
+//   return lastRowPadding - workingTriangleWidth();
+// };
 
 function addCustomFlexBreaks(
   rowLimit,
   baseHabitLength
 ) {
+  let widestBaseRowPossible = Math.floor((baseHabitLength + 6) / 3);
   let baseRowSize =
-    $(`#triangles-0`).width() < 480 ? rowLimit : widestBaseRowPossible();;
+    $(`#triangles-0`).width() < 480 ? widestBaseRowPossible : rowLimit;
   addFlexBreakAfterNthTriangle(baseRowSize, baseHabitLength);
 }
 
 const baseRowPositiveSpace = function() {
   let workingWidth = $(`#triangles-0`).width();
   let workingFontSize = parseFloat($(`#triangles-0`).css("font-size"), 10);
-  console.log("trisize", workingTriangleWidth(workingFontSize));
   let trianglesOfPositiveSpace = Math.floor(
     workingWidth / workingTriangleWidth(workingFontSize)
   );
@@ -181,29 +173,27 @@ const workingTriangleWidth = function(workingFontSize) {
 
 // Perform all functions needed to arrange flex-rows into pyramid
 const formatPyramid = function (
+  scaleFactor,
   rowLimit = BASE_ROW_WRAP_LENGTH,
   baseHabitLength
 ) {
 
   for (let habitIndex = 0; habitIndex < swiperInstances.length; habitIndex++) {
-    addCustomFlexBreaks(rowLimit, baseHabitLength);
+    addCustomFlexBreaks(BASE_ROW_WRAP_LENGTH, baseHabitLength);
     addFlexRowClasses(habitIndex);
 
     let numFlexRows = $(`#triangles-${habitIndex} .flex-break`).length + 1;
-
     for (let rowIndex = 0; rowIndex < numFlexRows; rowIndex++) {
       let rowLength = $(`#triangles-${habitIndex}`).find(
         `span.flex-row-${rowIndex}`
       ).length;
-
-      console.log(rowNeedsWrapping(rowLength));
-      if (rowNeedsWrapping(rowLength)) {  
+      if (Math.floor(baseHabitLength / 3) < rowLength * 2 - 1) {  
         styleInvertedTriangles(habitIndex, rowIndex);
       }
     }
   }
   wrapFlexRows($("#triangles-0 [class*='flex-break']").length + 1, 0);
-  scaleTriangles(rowLimit);
+  scaleTriangles(scaleFactor, rowLimit);
 };
 
 
@@ -257,12 +247,11 @@ export {
   BASE_ROW_WRAP_LENGTH,
   addFlexBreakOnFlexWrap,
   addFlexBreakAfterNthTriangle,
-  rowNeedsWrapping,
   styleInvertedTriangles,
   scaleTriangles,
   addFlexRowClasses,
   wrapFlexRows,
-  addFlexRowPadding,
+  // addFlexRowPadding,
   formatPyramid,
   workingTriangleWidth,
   baseRowPositiveSpace

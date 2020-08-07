@@ -20,7 +20,7 @@
         </div>
         <% end %>
 
-        <form class="toggle_completed_day" action="/habits/fractal/0" method="post">
+        <form class="toggle_completed_day" action="/habits/fractal/<%= @base_habit.id %>" method="post">
           <!-- Hidden element will pass the index of the slide to the backend for persistence -->
           <input type="hidden" name="node_completed_index" value="" id="node-completed-index">
           <div class="swiper-container">

@@ -1,22 +1,25 @@
 <% habits = @objective.habits %>
 <% habit_ids = habits.map { |h| h.id.to_s } %>
+<form action="<%= "/objectives/#{@objective.id}/update" %>" method="post">
+<fieldset>
 <div class="input-group side-by-side">
   <div class="input-group-prepend"><span class="input-group-text">Objective Name</span></div>
   <input type="text" class="form-control" name="objective_name" value="<%= @objective.name %>"
     placeholder="Describe the behaviour" required id="objective-name">
   <label class="fui-new" for="objective-name"></label>
 </div>
-
+<!-- 
 <div class="input-group side-by-side">
   <div class="input-group-prepend"><span class="input-group-text">Description</span></div>
   <input type="text" class="form-control" name="objective_description" value="<%= @objective %>"
     placeholder="Describe the behaviour" required id="objective-description">
   <label class="fui-new" for="objective-description"></label>
 </div>
+-->
 
 <div class="input-group side-by-side">
   <div class="input-group-prepend"><span class="input-group-text">Aspect (most common)</span></div>
-  <input disabled type="text" class="form-control" name="aspect_tag" value="<%= habits.first.aspect %>">
+  <h4><%= habits.first.aspect %></h4>
   <label class="fui-tag" for="aspect-tag"></label>
 </div>
 
@@ -26,21 +29,24 @@
     value="<%= habits.first.date_of_initiation.strftime('%Y-%m-%d') %>" id="objective-start-date">
   <label class="fui-calendar" for="objective-start-date"></label>
 </div>
-<a href="<%= "/objectives/#{@objective.id}/update" %>" class="btn btn-warning btn-lg btn-block">Update Objective Details</a>
-
+<div class="input-group side-by-side h-flex col-sm-6">
+  <button class="btn btn-inverse" type="submit">Update Objective</button>
+  <button class="btn btn-danger" formaction="<%= "/objectives/#{@objective.id}/delete" %>">Delete Objective</button>
+</div>
 <div class="objective-dashboard h-flex">
   <div class="card-header">Running Streaks:</div>
   <div class="card-body">
     <% habits.each do |h| %>
-      <div class="streak-count"><h3><%= calculate_streak(h) %></h3></div>
-      <div class="input-group-prepend">
-        <span class="input-group-text"><%= h.name %></span>
-      </div>
-      <span>
-      <a href="<%= "/habits/fractal/#{h.id}" %>" class="btn btn-info btn-block">Track Habit</a>
-      <a href="<%= "/habits/#{h.id}/update" %>" class="btn btn-inverse btn-block">Habit Summary</a>
+      <span class="streak-count"><h3 class="d-inline-block"><%= calculate_streak(h) %></h3></span>
+      <h4><%= split_and_cap(h.name) %></h4></span>
+      <span class="btn-block">
+      <a href="<%= "/habits/fractal/#{h.id}" %>" class="btn btn-info" >Track Habit</a>
+      <a href="<%= "/habits/#{h.id}/update" %>" class="btn btn-inverse">Habit Details</a>
       </span>
     <% end %>
   </div>
 
 </div>
+
+</fieldset>
+</form>
