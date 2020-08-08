@@ -126,16 +126,10 @@ def list_exists?(habit_id, h_list_id)
   session[:lists].any? { |l| l[:habit_id] == habit_id && l[:habit_list_id] == h_list_id}
 end
 
-def update_habit_after_list_completed!(habit_id, node_index)
-  node = get_habit(habit_id).get_nth(node_index)
-  return nil if node.today == 't'
-  node.today = 't'
-end
-
 def calculate_streak(habit)
   count = 0
-  habit.each_node_completed? do |node_data|
-    break unless node_data == 't'
+  habit.each do |node|
+    break unless node.today == 't'
     count +=1
   end
   count
@@ -340,18 +334,18 @@ end
 get /\/habits\/fractal((\/(?:\d{1,})){1,})/ do
   # Split habit_id parameters into an array of integers
   habits_in_chain = params['captures'].first.split("/")[1..-1].map(&:to_i)
-  
+
   @habits = habits_in_chain
   .map { |id| get_habit(id) }
   .sort_by(&:length).reverse
   .each { |h| h.update_to_today! }
+  # binding.pry
   unless (@habits.all? {|h| session[:habits].include?(h)})
     halt 404
   end
 
   @base_habit = @habits.first
   @length_of_longest_habit = @base_habit.length
-
   @intro_spiel = render_markdown(params[:initial] ? TEXT[:existing_habit][:new] : TEXT[:existing_habit][:old])
   @page_title = "Fractal Habit Triangle"
   @reference_date = @habits.max_by(&:length).date_of_initiation
@@ -367,7 +361,7 @@ post /\/habits\/fractal((\/(?:\d{1,})){1,})/ do
   toggle_day_switch_value = ("completed-day-" + params[:node_completed_index])
 
   habit_node_for_day = @habit.get_nth(params[:node_completed_index].to_i)
-  habit_node_for_day.today = params.key?(toggle_day_switch_value) ? 't' : 'f'
+  habit_node_for_day.today = (habit_node_for_day.today == 't') ? 'f' : 't'
 
   redirect "/habits/fractal/#{@habit.id}"
 end
@@ -397,8 +391,8 @@ post "/habits/:habit_id/list/:list_id/complete_all" do |habit_id, list_id|
   @list = get_task_list(@habit_id, @list_id)
 
   mark_all_tasks_completed!(@list)
-  length_of_habit = get_habit(@habit_id).length
-  update_habit_after_list_completed!(@habit_id, length_of_habit - @list_id - 1)
+  get_habit(@habit_id).head_node.today = 't'
+
   session[:message] = 'List marked as complete.'
   redirect "/habits/fractal/#{@habit_id}"
 end

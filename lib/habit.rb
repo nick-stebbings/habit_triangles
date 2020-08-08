@@ -22,7 +22,7 @@ module NodeOperations
   
   def each_node_completed?
     head_node.each do |current_node|
-      yield(current_node.today)  
+      yield current_node if block_given?
     end
     head_node
   end
@@ -69,7 +69,7 @@ class Habit
     end
     len
   end
-  
+
   def each
     current_node = head_node
     while current_node
@@ -77,5 +77,13 @@ class Habit
       current_node = current_node.yest
     end
     head_node
+  end
+
+  def reverse_each(head = @head_node, &block)
+    return if head.nil?
+
+    reverse_each(head.yest, &block)
+    block.call(head) if block_given?
+    head
   end
 end

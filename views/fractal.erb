@@ -26,9 +26,11 @@
           <input type="hidden" id="habit-streak-length" value="<%= calculate_streak(@base_habit) %>">
           <div class="swiper-container">
             <div class="swiper-wrapper">
-              <% @base_habit.reverse_each.with_index do |node, idx| %>
-              <% @date_today = @reference_date + (@length_of_longest_habit - idx - 1) %>
-              <div class="swiper-slide" data-name="<%= "0-#{idx}-day-#{node.today}" %>"
+              <% idx = 0 %>
+              <% length = @base_habit.length %>
+              <% @base_habit.reverse_each do |node| %>
+              <% @date_today = @reference_date + idx + 1 %>
+              <div class="swiper-slide" data-name="<%= "0-#{length - 1 - idx}-day-#{node.today}" %>"
                 data-date="<%= "#{@date_today.strftime '%d'}" %>">&nbsp;
                 <!-- Day specific information -->
                 <dl class="v-flex">
@@ -48,10 +50,10 @@
 
                     <!-- Toggle button -->
                     <% if @base_habit.is_atomic %>
-                    <a class="btn btn-inverse"
+                    <a class="btn btn-xs btn-inverse"
                       href="/habits/<%= @base_habit.id %>/list/<%= get_last_task_list_for_habit(@base_habit.id)[:habit_list_id] %>">Tasks</a>
                     <% end %>
-                    <a class="btn btn-secondary" href="/habits/<%= @base_habit.id %>/update">Summary</a>
+                    <a class="btn btn-xs btn-secondary" href="/habits/<%= @base_habit.id %>/update">Summary</a>
                     <div class="bootstrap-switch-square" data-toggle="tooltip" data-placement="right"
                       title="<%= TEXT[:fractal][:tooltip_day_toggle] %>">
                       <input name="completed-day-<%= idx %>" id="completed-day-<%= idx %>" type="checkbox"
@@ -61,6 +63,7 @@
                   </dd>
                 </dl>
               </div><!-- end swiper slide -->
+              <% idx += 1 %>
               <% end %>
             </div>
             <!-- Add Arrows -->

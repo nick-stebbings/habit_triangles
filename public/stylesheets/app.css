@@ -452,6 +452,18 @@ span.triangle-wrapper {
   flex-basis: 100%;
 }
 
+
+.custom-flex-row:nth-of-type(6) {
+  order: 6;
+  flex-basis: 100%;
+}
+
+
+.custom-flex-row:nth-of-type(7) {
+  order: 7;
+  flex-basis: 100%;
+}
+
 .tessellated {
   margin-left: -2.8em;
 }

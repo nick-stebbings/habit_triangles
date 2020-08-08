@@ -153,8 +153,8 @@ function addCustomFlexBreaks(
   baseHabitLength
 ) {
   let widestBaseRowPossible = Math.floor((baseHabitLength + 6) / 3);
-  let baseRowSize =
-    $(`#triangles-0`).width() < 480 ? widestBaseRowPossible : rowLimit;
+  let newBaseRowLength = widestBaseRowPossible % 2 != 0 ? widestBaseRowPossible : widestBaseRowPossible - 1
+  let baseRowSize = ($(`#triangles-0`).width() < 480 ? newBaseRowLength : rowLimit);
   addFlexBreakAfterNthTriangle(baseRowSize, baseHabitLength);
 }
 
