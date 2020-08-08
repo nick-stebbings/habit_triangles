@@ -608,16 +608,14 @@ label:last-child {
 }
 
 /*-- Media Queries */
-@media screen and (max-width: 360px) {
+@media only screen 
+and (min-width : 320px) 
+and (max-width: 480px) {
   #container {
     padding: 0;
-  }
-}
-
-@media screen and (max-width: 480px) {
-  #container {
     width: 100%;
   }
+}
 
   div.text-justify p,
   div.card-header,

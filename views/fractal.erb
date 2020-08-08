@@ -54,7 +54,7 @@
                       href="/habits/<%= @base_habit.id %>/list/<%= get_last_task_list_for_habit(@base_habit.id)[:habit_list_id] %>">Tasks</a>
                     <% end %>
                     <a class="btn btn-xs btn-secondary" href="/habits/<%= @base_habit.id %>/update">Summary</a>
-                    <div class="bootstrap-switch-square" data-toggle="tooltip" data-placement="right"
+                    <div class="bootstrap-switch-square" data-size="xs" data-toggle="tooltip" data-placement="right"
                       title="<%= TEXT[:fractal][:tooltip_day_toggle] %>">
                       <input name="completed-day-<%= idx %>" id="completed-day-<%= idx %>" type="checkbox"
                         data-toggle="switch" data-on-text="<i class='fui-check'></i>"
