@@ -544,7 +544,6 @@ span.triangle-wrapper {
 
 [role="list"] .h-flex {
   justify-content: flex-start;
-  flex-wrap: nowrap;
 }
 
 [role="list"] .destroy_btn {
@@ -613,9 +612,13 @@ and (min-width : 320px)
 and (max-width: 480px) {
   #container {
     padding: 0;
-    width: 100%;
   }
 }
+
+@media screen and (max-width: 480px) {
+  #container {
+    width: 100%;
+  }
 
   div.text-justify p,
   div.card-header,
