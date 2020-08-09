@@ -381,8 +381,12 @@ post /\/habits\/fractal((\/(?:\d{1,})){1,})/ do
   toggle_day_switch_value = ("completed-day-" + params[:node_completed_index])
 
   habit_node_for_day = @habit.get_nth(params[:node_completed_index].to_i)
+<<<<<<< Updated upstream
   habit_node_for_day.today = (habit_node_for_day.today == 't') ? 'f' : 't'
 
+=======
+  habit_node_for_day.today = params.key?(day_toggle_switch_value) ? 't' : 'f'
+>>>>>>> Stashed changes
   redirect "/habits/fractal/#{@habit.id}"
 end
 
