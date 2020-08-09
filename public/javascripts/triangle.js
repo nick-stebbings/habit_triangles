@@ -1,5 +1,5 @@
-const TRIANGLE_SCALE_FACTOR = 18;
-const BASE_ROW_WRAP_LENGTH = 15;
+const TRIANGLE_SCALE_FACTOR = 21;
+const BASE_ROW_WRAP_LENGTH = 12;
 var swiperInstances = [];
 
 jQuery.fn.reverse = [].reverse;
@@ -12,34 +12,36 @@ $(".swiper-container").each(function (index, element) {
   $this.addClass("instance-" + index);
   $this
   .find(".swiper-pagination")
-  .slice(0, 1)
+  .reverse()
+  .slice(0,1)
   .addClass("swiper-pagination-" + index);
   $this
-  .find(".swiper-pagination") 
-  .slice(0, 1)
+  .find(".swiper-pagination-" + index)
   .attr("id", "triangles-" + index);
   $this
   .find(".swiper-button-prev")
-  .slice(0, 1)
+  .slice(index, 1)
   .addClass("swiper-btn-prev-" + index);
   $this
   .find(".swiper-button-next")
-  .slice(0, 1)
+  .slice(index, 1)
   .addClass("swiper-btn-next-" + index);
   
   var newSwiper = new Swiper(".instance-" + index, {
       // Settings
+      cssMode: true,
+      speed: 100,
       nextButton: ".swiper-btn-next-" + index,
       prevButton: ".swiper-btn-prev-" + index,
       paginationType: "bullets",
       paginationClickable: true,
       pagination: "#triangles-" + index,
       // Custom pagination rendering for triangles interface
-      paginationBulletRender: function (index, className) {
-        var slides = $("." + this.wrapperClass).find(".swiper-slide");
+      paginationBulletRender: function (idx, className) {
+        var slides = $("." + this.wrapperClass + "-" + index).find(".swiper-slide");
         var len = slides.length;
         var currentSlide = slides.reverse()[
-          len - index - 1
+          len - idx - 1
         ];
         var dayCompletedClass =
         $(currentSlide).attr("data-name").slice(-1) == "t"
@@ -58,10 +60,6 @@ $(".swiper-container").each(function (index, element) {
     });
     swiperInstances.push(newSwiper);
   });
-
-// const widestBaseRowPossible = function() {
-//   Math.floor(swiperInstances[0].length / 3);
-// };
 
 // Adds flex-break divs to break up triangles into flex-row containers
 const addFlexBreakOnFlexWrap = function () {
@@ -137,17 +135,6 @@ const wrapFlexRows = function (numRows, swiperId) {
   }
 };
 
-// const addFlexRowPadding = function (rowIndex) {
-//   let lastRowPadding;
-//   let workingFontSize = parseFloat($(`#triangles-0`).css("font-size"), 10);
-//   if (rowIndex === 1) {
-//     lastRowPadding = 1;
-//   } else {
-//     lastRowPadding = $(`#triangles-${rowIndex} .flex-break`).css("font-size");
-//   }
-//   return lastRowPadding - workingTriangleWidth();
-// };
-
 function addCustomFlexBreaks(
   rowLimit,
   baseHabitLength
@@ -155,7 +142,7 @@ function addCustomFlexBreaks(
   let widestBaseRowPossible = Math.floor((baseHabitLength + 6) / 3);
   let newBaseRowLength = widestBaseRowPossible % 2 != 0 ? widestBaseRowPossible : widestBaseRowPossible - 1
   let baseRowSize =
-    $(`#triangles-0`).width() < 480 ? rowLimit : newBaseRowLength;
+    $(`#triangles-0`).width() < 480 ? newBaseRowLength : rowLimit;
   addFlexBreakAfterNthTriangle(baseRowSize, baseHabitLength);
 }
 
@@ -191,9 +178,13 @@ const formatPyramid = function (
       if (Math.floor(baseHabitLength / 3) < rowLength * 2 - 1) {  
         styleInvertedTriangles(habitIndex, rowIndex);
       }
+      wrapFlexRows(
+        $(`#triangles-${habitIndex} [class*='flex-break']`).length + 1,
+        habitIndex
+      );
     }
+    console.log(habitIndex, 'habit', '  , rows:', numFlexRows);
   }
-  wrapFlexRows($("#triangles-0 [class*='flex-break']").length + 1, 0);
   scaleTriangles(scaleFactor, rowLimit);
 };
 

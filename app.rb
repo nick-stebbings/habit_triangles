@@ -350,6 +350,13 @@ post "/habits/:id/delete" do |id|
   redirect !!objective ? "/objectives/#{objective.id}" : "/"
 end
 
+post "/objectives/:id/delete" do |id|
+  objective = get_objective(id.to_i)
+  session[:objectives].delete(objective.name)
+  binding.pry
+  redirect "/"
+end
+
 ## Fractal Habit Triangle
 get /\/habits\/fractal((\/(?:\d{1,})){1,})/ do
   # Split habit_id parameters into an array of integers
@@ -359,7 +366,6 @@ get /\/habits\/fractal((\/(?:\d{1,})){1,})/ do
   .map { |id| get_habit(id) }
   .sort_by(&:length).reverse
   .each { |h| h.update_to_today! }
-  # binding.pry
   unless (@habits.all? {|h| session[:habits].include?(h)})
     halt 404
   end
@@ -376,18 +382,15 @@ end
 post /\/habits\/fractal((\/(?:\d{1,})){1,})/ do
   habits_in_chain = params['captures'].first.split("/")[1..-1].map(&:to_i)
   @habits = habits_in_chain.map { |id| get_habit(id) }
-  @habit = @habits.first
+  @base_habit = @habits.first
+  @length_of_longest_habit = @base_habit.length
 
   toggle_day_switch_value = ("completed-day-" + params[:node_completed_index])
-
-  habit_node_for_day = @habit.get_nth(params[:node_completed_index].to_i)
-<<<<<<< Updated upstream
+  habit_idx, node_idx = params[:node_completed_index].split('_')
+  habit_node_for_day = get_habit(habit_idx.to_i).get_nth(node_idx.to_i)
   habit_node_for_day.today = (habit_node_for_day.today == 't') ? 'f' : 't'
 
-=======
-  habit_node_for_day.today = params.key?(day_toggle_switch_value) ? 't' : 'f'
->>>>>>> Stashed changes
-  redirect "/habits/fractal/#{@habit.id}"
+  redirect env["HTTP_REFERER"]
 end
 
 ## Todo List Modular Routes

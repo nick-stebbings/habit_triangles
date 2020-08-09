@@ -25,27 +25,28 @@
           <input type="hidden" name="node_completed_index" value="" id="node-completed-index">
           <input type="hidden" id="habit-streak-length" value="<%= calculate_streak(@base_habit) %>">
           <div class="swiper-container">
-            <div class="swiper-wrapper">
+            <div class="swiper-wrapper swiper-wrapper-0">
               <% idx = 0 %>
               <% length = @base_habit.length %>
               <% @base_habit.reverse_each do |node| %>
               <% @date_today = @reference_date + idx + 1 %>
-              <div class="swiper-slide" data-name="<%= "0-#{length - 1 - idx}-day-#{node.today}" %>"
+              <div class="swiper-slide" data-name="<%= "#{@base_habit.id}-#{length - 1 - idx}-day-#{node.today}" %>"
                 data-date="<%= "#{@date_today.strftime '%d'}" %>">&nbsp;
                 <!-- Day specific information -->
-                <dl>
+                <dl class="date-info">
                   <dt>
                     <div class="input-group-prepend"><span class="input-group-text">Date:</span></div>
                   </dt>
                   <dd class="habit-tracked-day">
-                    <h3><%= @date_today.strftime "%m/ %d/ %Y" %></h3>
+                    <h3><%= @date_today.strftime "%m / %d / %Y" %></h3>
                   </dd>
                 </dl>
                 <!-- Habit specific information -->
-                <dl class="habit-list">
+                <dl class="habit-dash">
                   <dt>
                     <div class="input-group-prepend"><span class="input-group-text">Update Habit:</span></div>
                   </dt>
+                  <h3><%= split_and_cap(@base_habit.name) %></h3>
                   <dd class="habit-tracked-toggle v-flex">
 
                     <!-- Toggle button -->
@@ -65,64 +66,66 @@
               </div><!-- end swiper slide -->
               <% idx += 1 %>
               <% end %>
-                          <div class="swiper-slide1 hidden">
+
+            </div>
+            <!-- Add Arrows -->
+            <div class="swiper-button-next fui-arrow-right"></div>
+            <div class="swiper-button-prev fui-arrow-left"></div>
+                          <div class="swiper-slide1">
                             <!-- For each remaining habit in the collection -->
                             <% @habits.each_with_index do |habit, habit_idx| %>
 
                             <!-- Skip the base habit -->
                             <% if habit_idx.zero? then next end %>
 
-                            <div class="swiper-container swiper-container<%= habit_idx %>" id="swiper<%= habit_idx %>">
-                              <div class="swiper-wrapper<%= habit_idx %>">
+                            <div class="swiper-container swiper-container-<%= habit_idx %>"
+                              id="swiper-container-<%= habit_idx %>">
+                              <div class="swiper-wrapper swiper-wrapper-<%= habit_idx %>">
                                 <% node_idx = 0 %>
                                 <% habit.each do |node| %>
-                                <!-- We need the slides for the pagination triangles, each slide with data-name attribute   -->
                                 <% @date_of_completion = habit.date_of_initiation + (habit.length - node_idx - 1) %>
                                 <div class="swiper-slide"
-                                  data-name="<%== "#{habit_idx}-#{node_idx}-day-#{node.today}" %>"
-                                  data-date="<%== "<span>#{@date_of_completion.strftime '%d'}</span>" %>">
+                                  data-name="<%== "#{habit.id}-#{node_idx}-day-#{node.today}" %>"
+                                  data-date="<%== "<span>#{@date_of_completion.strftime '%d'}</span>" %>">&nbsp;
 
-                                  <!-- Habit specific information -->
-                                  <dl class="v-flex habit-list">
-                                    <dt class="input-group-text">
-                                      <div><%== render_markdown(habit.name.split('_').join("\n\r")) %></div>
-                                    </dt>
-                                    <dd class="habit-tracked-toggle h-flex">
+                <!-- Habit specific information -->
+                <dl class="habit-dash">
+                  <dt>
+                    <div class="input-group-prepend"><span class="input-group-text">Update Habit:</span></div>
+                  </dt>
+                  <h3><%= split_and_cap(habit.name) %></h3>
+                  <dd class="habit-tracked-toggle v-flex">
 
-                                      <!-- Toggle button -->
-                                      <% if habit.is_atomic %>
-
-                                      <button class="btn btn-inverse">
-                                        <a
-                                          href="/habits/<%= @base_habit.id %>/list/<%= habit.length - node_idx - 1 %>">Tasks</a>
-                                      </button>
-                                      <% end %>
-                                      <button class="btn btn-info">
-                                        <a href="/habits/<%= habit.id %>">Summary</a>
-                                      </button>
-                                      <div class="bootstrap-switch-square">
-
-                                      </div>
-                                    </dd>
-                                  </dl>
+                    <!-- Toggle button -->
+                    <% if habit.is_atomic %>
+                    <a class="btn btn-xs btn-inverse"
+                      href="/habits/<%= habit.id %>/list/<%= get_last_task_list_for_habit(habit.id)[:habit_list_id] %>">Tasks</a>
+                    <% end %>
+                    <a class="btn btn-xs btn-secondary" href="/habits/<%= habit.id %>/update">Summary</a>
+                    <div class="bootstrap-switch-square" data-toggle="tooltip" data-placement="right"
+                      title="<%= TEXT[:fractal][:tooltip_day_toggle] %>">
+                      <input name="completed-day-<%= node_idx %>" id="completed-day-<%= node_idx %>" type="checkbox"
+                        data-toggle="switch" data-on-text="<i class='fui-check'></i>"
+                        data-off-text="<i class='fui-cross'></i>" <% if (node.today == 't') %> checked <% end %> />
+                    </div>
+                  </dd>
+                </dl>
 
                                 </div>
                                 <% node_idx += 1 %>
                                 <% end %>
                               </div>
                               <!-- Swiper buttons are not needed as we use them on the base swiper -->
-                              <div class="swiper-button-prev<%= habit_idx %>"></div>
-                              <div class="swiper-button-next<%= habit_idx %>"></div>
-                              <div class="swiper-pagination" id="pag-triangles<%= habit_idx %>"></div>
+                              <div class="swiper-button-prev-<%= habit_idx %>"></div>
+                              <div class="swiper-button-next-<%= habit_idx %>"></div>
+                                          
+                            <div class="swiper-pagination-wrapper">
+                              <div class="d-flex flex-wrap-reverse swiper-pagination swiper-pagination-<%= habit_idx %> h-flex"></div>
+                            </div><!-- end swiper wrapper -->
 
                             </div>
                             <% end %>
                           </div>
-            </div>
-            <!-- Add Arrows -->
-            <div class="swiper-button-next fui-arrow-right"></div>
-            <div class="swiper-button-prev fui-arrow-left"></div>
-
             <div class="swiper-pagination-wrapper">
               <div class="d-flex flex-wrap-reverse swiper-pagination h-flex"></div>
             </div><!-- end swiper wrapper -->
