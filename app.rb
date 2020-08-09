@@ -15,6 +15,7 @@ TEXT = YAML.load_file(ROOT + '/public/paragraphs_text.yaml')
 
 MESSAGES = {
   invalid_objective_name: "You entered an invalid objective name. Please try to summarise in up to 5 words, separated by spaces.",
+  invalid_objective_description: "You entered an invalid objective description. Please limit it to 50 characters or less.",
   invalid_habit_name: "You entered an invalid habit name. Please try to summarise in up to 5 words, split with spaces.",
   invalid_habit_description: "You entered an invalid habit description. Please limit it to 50 characters or less.",
   invalid_date_of_initiation: "You entered an invalid date, it is in the future!",
@@ -36,7 +37,7 @@ helpers do
   end
 
   def get_objective(id)
-    session[:objectives].values.first { |objective| objective.id == id }
+    session[:objectives].values.find {|o| o.id == id }
   end
 
   def get_next_id(of)
@@ -167,11 +168,16 @@ end
     renderer.render(text)
   end
 
-  def set_session_message!
+  def set_habit_session_message!
     session[:message] = MESSAGES[:invalid_habit_description] unless valid_habit_description?(params[:habit_description])
     session[:message] = MESSAGES[:invalid_aspect_tag] unless valid_aspect?(params[:aspect_tag])
     date = DateTime.parse(params[:date_of_initiation]).new_offset if params[:date_of_initiation]
     session[:message] = MESSAGES[:invalid_date_of_initiation] unless valid_date?(date)
+  end
+
+  def set_objective_session_message!
+    session[:message] = MESSAGES[:invalid_objective_name] unless valid_input(params[:objective_name], :objective)
+    session[:message] = MESSAGES[:invalid_objective_description] unless valid_habit_description?(params[:objective_description])
   end
 
   def set_attributes_for_habit!(habit)
@@ -182,6 +188,11 @@ end
     habit.aspect = params[:aspect_tag].strip
     habit.is_atomic = (params[:is_atomic] == 'on')
     habit.update_to_today! 
+  end
+
+  def set_attributes_for_objective!(objective)
+    objective.name = params[:objective_name].strip
+    objective.description = params[:objective_description].strip
   end
 # end
 
@@ -245,26 +256,35 @@ get "/objectives/:id/update" do |id|
   @habits = @objective.habits
   @page_title = "Objective Summary"
   @intro_spiel = TEXT[:objectives][:update]
-  @sub_info = "This is a list of habits for the objective named <h4>#{split_and_cap(@objective.name)}</h4>."
+  @sub_info = in_paragraphs("This is a list of habits for the objective named <h4>#{split_and_cap(@objective.name)}</h4>.")
   
   erb :update_objective, :layout => :simple_layout
 end
 
-get "/objectives/:id" do |id|
+post "/objectives/:id/update" do |id|
   @objective = get_objective(id.to_i)
+  @habits = @objective.habits
+  @page_title = "Objective Summary"
+  @intro_spiel = TEXT[:objectives][:update]
+  @sub_info = in_paragraphs("This is a list of habits for the objective named <h4>#{split_and_cap(@objective.name)}</h4>.")
 
+  set_objective_session_message!
+  if session[:message]
+    @error = session[:message]
+    halt erb :update_objective, :layout => :simple_layout 
+  else
+    set_attributes_for_objective!(@objective)
+  end
+  redirect "/objectives/#{id}"
+end
+
+get "/objectives/:id" do |id|
+  halt 404 unless (@objective = get_objective(id.to_i))
   @page_title = "List of Habits By Objective"
   @intro_spiel = TEXT[:objectives][:old]
   @sub_info = "This is a list of habits for the objective named <h4>#{split_and_cap(@objective.name)}</h4>."
   erb :index_habits, :layout => :simple_layout
 end
-
-# get "/objectives/:id/update" do |id|
-#   @objective = get_objective(id.to_i)
-#   @page_title = "Objective Summary"
-#   @intro_spiel = "This is a list of habits for the objective named <b>#{@objective.name}</b>."
-#   erb :update_objective, :layout => :simple_layout
-# end
 
 ## Habit Routes
 get "/habits" do
@@ -301,7 +321,7 @@ post "/habits/:id/update" do |id|
   @sub_info = render_markdown(TEXT[:existing_habit][:sub_info]) 
   @page_title = "Update Habit Summary"
   
-  set_session_message!
+  set_habit_session_message!
   if session[:message]
     @error = session[:message]
     halt erb :update_habit, :layout => :simple_layout 

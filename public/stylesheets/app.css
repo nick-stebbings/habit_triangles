@@ -66,7 +66,7 @@ a {
 
 h4 {
   display: inline-block;
-  padding-left: 50px;
+  padding-left: 10%;
   font-size: 1.2rem;
 }
 
@@ -115,10 +115,19 @@ h1 {
   margin-left: auto;
 }
 
-#fractal .h-flex .input-group-prepend>span,
+#fractal div.input-group-text,
+#fractal div.input-group-prepend {
+  height: 1rem;
+  margin-bottom: 1rem;
+}
+
+#fractal .card dl > * {
+  justify-content: start;
+}
+
+#fractal .h-flex .input-group-prepend > span,
 div.input-group-prepend>.input-group-text {
-  border-top-left-radius: 15px;
-  border-bottom-left-radius: 15px;
+  border-radius: 15px;
 }
 
 .v-flex div.input-group-prepend span {
@@ -180,11 +189,11 @@ th span {
 }
 
 h3.d-inline-block {
-  margin: 3rem 0;
+  margin: 4rem 0;
 }
 
 span.streak-count h3 {
-  padding: 0 3rem;
+  padding: 0 4rem;
 }
 
 .table {
@@ -192,7 +201,7 @@ span.streak-count h3 {
 }
 
 .table th:first-child {
-  width: 10vw;
+  width: 20vw;
 }
 
 .table td:first-child {
@@ -232,7 +241,12 @@ div.input-group-prepend {
   font-size: 0.8rem;
 }
 
-  fieldset .side-by-side > :first-child {
+  fieldset .side-by-side > div > span.input-group-text {
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+  }
+
+  fieldset .side-by-side > .input-group-prepend:first-child {
   /* Align darkened labels to right of their own column */
   flex: 0 1 33%;
 }
@@ -273,7 +287,15 @@ dl.h-flex.side-by-side>dd {
 
 .h-flex .card-body .tick-box,
 .h-flex .card-body span {
-  margin-left: 49%;
+  /* margin-left: 49%; */
+}
+
+.h-flex .card-body,
+.h-flex .btn:last-of-type {
+  margin-right: 0.3rem;
+}
+.h-flex .btn:first-of-type {
+  margin-left: 0.8rem;
 }
 
 #new-objective .form-group,
@@ -291,9 +313,16 @@ dl.h-flex.side-by-side>dd {
   flex: 1;
 }
 
+.input-group h4,
 .side-by-side .form-group {
   display: flex;
   flex: 1;
+}
+
+
+fieldset .side-by-side > .btn.btn-xs {
+  flex: 1;
+  margin: 0.2rem;
 }
 
 /*---- Fractal Triangle Page ---- */
@@ -332,7 +361,7 @@ dl.h-flex.side-by-side>dd {
 
 #fractal h3,
 #fractal .bootstrap-switch-square {
-  margin: 0 0 0 10px;
+  margin: 0 0 0.5rem 1rem;
 }
 
 #fractal dl,
@@ -413,6 +442,7 @@ span.triangle-wrapper {
     "side null5   bot null6";
   height: 100%;
   width: 100%;
+  min-height: 50vh;
 }
 
 .swiper-btn-prev-0 {
@@ -500,14 +530,20 @@ span.triangle-wrapper {
 
 #fractal .card dl {
   width: 20%;
+  margin: -1rem 0 0 -1rem;
+  padding-bottom: 2px;
 }
 
 #fractal form {
   height: 40vh;
 }
 
+#fractal .bootstrap-switch {
+  height: 25px !important;
+  overflow: hidden;
+}
+
 .instance-0 .swiper-wrapper .swiper-slide {
-  grid-area: side;
   height: 100%;
 }
 
@@ -598,21 +634,28 @@ label:last-child {
   margin: 0;
 }
 
-.h-flex .card-body,
-.h-flex .btn:last-of-type {
-  margin-right: 0.3rem;
-}
-.h-flex .btn:first-of-type {
-  margin-left: 0.8rem;
-}
-
 /*-- Media Queries */
 @media only screen 
-and (min-width : 320px) 
-and (max-width: 480px) {
+and (max-width: 960px) {
   #container {
     padding: 0;
   }
+ [class*="fui-"] {
+    display: none;
+  }
+ .fui-cross, .fui-check {
+    display: initial;
+  }
+ 
+  .objective-dashboard .h-flex .btn:first-of-type,
+  .objective-dashboard .h-flex .btn:last-of-type {
+    flex: 1 0 50%;
+    margin: 2px;
+  }
+  
+.table tr{
+  display:block;
+}
 }
 
 @media screen and (max-width: 480px) {
@@ -625,7 +668,7 @@ and (max-width: 480px) {
   div.card-body,
   div.alert,
   div.col {
-    padding: 5px;
+    padding: 10px;
   }
 
   fieldset .side-by-side> :first-child {
@@ -637,9 +680,7 @@ and (max-width: 480px) {
     width: 100%;
   }
 
-  label:last-of-type {
-    /* display: none; */
-  }
+
 }
 
 @media screen and (max-width: 600px) {

@@ -33,16 +33,16 @@
               <div class="swiper-slide" data-name="<%= "0-#{length - 1 - idx}-day-#{node.today}" %>"
                 data-date="<%= "#{@date_today.strftime '%d'}" %>">&nbsp;
                 <!-- Day specific information -->
-                <dl class="v-flex">
+                <dl>
                   <dt>
                     <div class="input-group-prepend"><span class="input-group-text">Date:</span></div>
                   </dt>
                   <dd class="habit-tracked-day">
-                    <h3><%= @date_today.strftime "%m/%d/%Y" %></h3>
+                    <h3><%= @date_today.strftime "%m/ %d/ %Y" %></h3>
                   </dd>
                 </dl>
                 <!-- Habit specific information -->
-                <dl class="v-flex habit-list">
+                <dl class="habit-list">
                   <dt>
                     <div class="input-group-prepend"><span class="input-group-text">Update Habit:</span></div>
                   </dt>
@@ -54,7 +54,7 @@
                       href="/habits/<%= @base_habit.id %>/list/<%= get_last_task_list_for_habit(@base_habit.id)[:habit_list_id] %>">Tasks</a>
                     <% end %>
                     <a class="btn btn-xs btn-secondary" href="/habits/<%= @base_habit.id %>/update">Summary</a>
-                    <div class="bootstrap-switch-square" data-size="xs" data-toggle="tooltip" data-placement="right"
+                    <div class="bootstrap-switch-square" data-toggle="tooltip" data-placement="right"
                       title="<%= TEXT[:fractal][:tooltip_day_toggle] %>">
                       <input name="completed-day-<%= idx %>" id="completed-day-<%= idx %>" type="checkbox"
                         data-toggle="switch" data-on-text="<i class='fui-check'></i>"
