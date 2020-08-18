@@ -17,6 +17,10 @@ html {
   box-sizing: inherit;
 }
 
+.hide {
+  position: relative;
+}
+
 /*---- Main Headings and Paragraph Text ----*/
 
 h1 {
@@ -343,6 +347,7 @@ h3.d-inline-block {
 
   #fractal .swiper-pagination {
     font-size: 3vw;
+    margin: 0 !important;
   }
 
   /* Arrows */
@@ -410,12 +415,12 @@ div.input-group-prepend>.input-group-text {
   }
 
 /* Pagination text and alignment*/
-#fractal span.triangle span {
+#fractal span.triangle > span {
   position: relative;
   color: white;
   font-size: 1.2rem;
-  left: -3px;
-  bottom: -8px;
+  left: -6px;
+  bottom: -15px;
 }
 
 .swiper-pagination-wrapper {

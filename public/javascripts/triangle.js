@@ -1,5 +1,5 @@
-const TRIANGLE_SCALE_FACTOR = 21;
-const BASE_ROW_WRAP_LENGTH = 12;
+const BASE_TRIANGLE_SCALE = 12;
+const BASE_ROW_WRAP_LENGTH = 13;
 var swiperInstances = [];
 
 jQuery.fn.reverse = [].reverse;
@@ -28,57 +28,42 @@ $(".swiper-container").each(function (index, element) {
   .addClass("swiper-btn-next-" + index);
   
   var newSwiper = new Swiper(".instance-" + index, {
-      // Settings
-      cssMode: true,
-      speed: 100,
-      nextButton: ".swiper-btn-next-" + index,
-      prevButton: ".swiper-btn-prev-" + index,
-      paginationType: "bullets",
-      paginationClickable: true,
-      pagination: "#triangles-" + index,
-      // Custom pagination rendering for triangles interface
-      paginationBulletRender: function (idx, className) {
-        var slides = $("." + this.wrapperClass + "-" + index).find(".swiper-slide");
+    // Settings
+    preventInteractionOnTransition: true,
+    cssMode: true,
+    speed: 100,
+    nextButton: ".swiper-btn-next-" + index,
+    prevButton: ".swiper-btn-prev-" + index,
+    pagination: {
+      el: "#triangles-" + index,
+      clickable: false,
+      renderBullet: function (idx, className) {
+        var slides = $(this.wrapperEl).find(
+          ".swiper-slide"
+        );
         var len = slides.length;
-        var currentSlide = slides.reverse()[
-          len - idx - 1
-        ];
+        var currentSlide = slides.reverse()[len - idx - 1];
         var dayCompletedClass =
-        $(currentSlide).attr("data-name").slice(-1) == "t"
-        ? "success"
-        : "notyet";
+          $(currentSlide).attr("data-name").slice(-1) == "t"
+            ? "success"
+            : "notyet";
         var bulletStyles =
-        '<span class="triangle-wrapper"><span class="' +
-        className +
-        " triangle triangle-" +
-        dayCompletedClass +
-        '"><span>' +
-        $(currentSlide).attr("data-date") +
-        "</span></span></span>";
+          '<span class="triangle-wrapper"><span class="' +
+          className +
+          " triangle triangle-" +
+          dayCompletedClass +
+          '"><span>' +
+          $(currentSlide).attr("data-date") +
+          "</span></span></span>";
         return bulletStyles;
       },
-    });
+    },
+  });
     swiperInstances.push(newSwiper);
   });
 
-// Adds flex-break divs to break up triangles into flex-row containers
-const addFlexBreakOnFlexWrap = function () {
-  var offset_top_prev;
-
-  $(".triangle-wrapper").each(function () {
-    var offset_top = $(this).offset().top;
-
-    if (offset_top > offset_top_prev) {
-      // If the triangle moved due to flex wrapping...
-      // Add a flex-break element before the first triangle of each line
-      $(this).before("<div class='flex-break'></div>");
-    }
-    offset_top_prev = offset_top;
-  });
-};
-
-const addFlexBreakAfterNthTriangle = function (n, totalTriangles) {
-  let flexBreaksRequired = Math.floor(totalTriangles / n*2);
+const addFlexBreakAfterNthTriangle = function (n, rowLimit) {
+  let flexBreaksRequired = Math.floor(rowLimit / n*2);
   let nextElement = n;
   for (let i = 1; i <= flexBreaksRequired; i++) {
     let nthTrianglesSelector = `#fractal .triangle-wrapper:nth-of-type(${nextElement})`; // The break comes one triangle earlier for each row
@@ -101,13 +86,13 @@ const styleInvertedTriangles = function (habitIndex, flexRowIndex) {
         " transparent transparent transparent;" +
         "border-width: 5em 2.8em 0em 2.8em"
     );
-    $(this).find("span").attr("style", "bottom: 2.8em");
+    $(this).find("span").attr("style", "bottom: 3.2em");
   });
 };
 
-const scaleTriangles = function (scaleFactor, rowLimit = BASE_ROW_WRAP_LENGTH) {
+const scaleTriangles = function (scaleFactor) {
   let triangleWidth =
-    scaleFactor * TRIANGLE_SCALE_FACTOR * (1 / rowLimit).toFixed(3);
+    scaleFactor * BASE_TRIANGLE_SCALE;
   $("#fractal .swiper-pagination").css("font-size", `${triangleWidth}vh`);
 };
 
@@ -139,11 +124,11 @@ function addCustomFlexBreaks(
   rowLimit,
   baseHabitLength
 ) {
-  let widestBaseRowPossible = Math.floor((baseHabitLength + 6) / 3);
-  let newBaseRowLength = widestBaseRowPossible % 2 != 0 ? widestBaseRowPossible : widestBaseRowPossible - 1
-  let baseRowSize =
-    $(`#triangles-0`).width() < 480 ? newBaseRowLength : rowLimit;
-  addFlexBreakAfterNthTriangle(baseRowSize, baseHabitLength);
+  let widestBaseRowPossible = Math.floor((baseHabitLength *2  + 6) / 3);
+  let finalBaseRowSize = widestBaseRowPossible % 2 != 0 ? widestBaseRowPossible : widestBaseRowPossible - 1
+  finalBaseRowSize =
+    $(`#triangles-0`).width() > 480 ? rowLimit : finalBaseRowSize;
+  addFlexBreakAfterNthTriangle(finalBaseRowSize, baseHabitLength);
 }
 
 const baseRowPositiveSpace = function() {
@@ -163,87 +148,36 @@ const workingTriangleWidth = function(workingFontSize) {
 const formatPyramid = function (
   scaleFactor,
   rowLimit = BASE_ROW_WRAP_LENGTH,
-  baseHabitLength
+  baseHabitLength,
+  addDivs = false
 ) {
-
-  for (let habitIndex = 0; habitIndex < swiperInstances.length; habitIndex++) {
-    addCustomFlexBreaks(BASE_ROW_WRAP_LENGTH, baseHabitLength);
-    addFlexRowClasses(habitIndex);
-
-    let numFlexRows = $(`#triangles-${habitIndex} .flex-break`).length + 1;
-    for (let rowIndex = 0; rowIndex < numFlexRows; rowIndex++) {
-      let rowLength = $(`#triangles-${habitIndex}`).find(
-        `span.flex-row-${rowIndex}`
-      ).length;
-      if (Math.floor(baseHabitLength / 3) < rowLength * 2 - 1) {  
-        styleInvertedTriangles(habitIndex, rowIndex);
+  let baseWidth = Math.floor((baseHabitLength * 2) / 3);
+  if (addDivs) {
+    for (let habitIndex = 0; habitIndex < swiperInstances.length; habitIndex++) {
+      
+      addCustomFlexBreaks(rowLimit, baseHabitLength);
+      addFlexRowClasses(habitIndex);
+      let numFlexRows = $(`#triangles-${habitIndex} .flex-break`).length + 1;
+    
+      for (let rowIndex = 0; rowIndex < numFlexRows; rowIndex++) {
+        let rowLength = $(`#triangles-${habitIndex}`).find( `span.flex-row-${rowIndex}` ).length;
+        if (baseWidth < rowLength * 2 - 1) { styleInvertedTriangles(habitIndex, rowIndex); }
       }
-      wrapFlexRows(
-        $(`#triangles-${habitIndex} [class*='flex-break']`).length + 1,
-        habitIndex
-      );
+      wrapFlexRows(numFlexRows, habitIndex );
     }
-    console.log(habitIndex, 'habit', '  , rows:', numFlexRows);
   }
-  scaleTriangles(scaleFactor, rowLimit);
+  scaleTriangles(scaleFactor, baseWidth);
 };
-
-
-  // Using this function to change display of the remaining (shorter) habits when the prev button is clicked
-  function customButtonEvents(event) {
-    let swiperId = event.data.swiperId;
-    var btnClass = `.swiper-btn-${event.data.direction}-${swiperId}`;
-    var baseHabitCurrentDay = swiperInstances[0].activeIndex;
-
-    let swiperSlides = swiperInstances[swiperId].slides;
-    let habitLength = swiperSlides.length;
-
-    if (event.data.direction === "next") {
-      switch (true) {
-        case baseHabitCurrentDay == habitLength + 1:
-          console.log(getActivePaginationTriangle(swiperId));
-
-          getActivePaginationTriangle(swiperId).toggleClass(
-            "swiper-pagination-bullet-active"
-          );
-          console.log("toggle fwd");
-          break;
-        case baseHabitCurrentDay <= habitLength:
-          console.log("forward hab 1");
-          $(btnClass).click();
-          break;
-        default:
-          console.log("nowt");
-      }
-    } else if (event.data.direction === "prev") {
-      switch (true) {
-        case baseHabitCurrentDay == habitLength:
-          $(swiperSlides.slice(-1)).toggleClass(
-            "swiper-pagination-bullet-active"
-          );
-          console.log("slide:", swiperSlides[habitLength - 1]);
-          break;
-        case baseHabitCurrentDay <= habitLength:
-          $(btnClass).click();
-          console.log("back up habit 1");
-          break;
-        default:
-          console.log("nowt");
-      }
-    }
-  }
   
 export {
   swiperInstances,
-  TRIANGLE_SCALE_FACTOR,
+  BASE_TRIANGLE_SCALE,
   BASE_ROW_WRAP_LENGTH,
-  addFlexBreakOnFlexWrap,
   addFlexBreakAfterNthTriangle,
   styleInvertedTriangles,
   scaleTriangles,
   addFlexRowClasses,
   wrapFlexRows,
-  // addFlexRowPadding,
   formatPyramid,
   workingTriangleWidth,
   baseRowPositiveSpace

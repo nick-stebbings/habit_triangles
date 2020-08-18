@@ -81,9 +81,10 @@
                             <div class="swiper-container swiper-container-<%= habit_idx %>"
                               id="swiper-container-<%= habit_idx %>">
                               <div class="swiper-wrapper swiper-wrapper-<%= habit_idx %>">
-                                <% node_idx = 0 %>
-                                <% habit.each do |node| %>
-                                <% @date_of_completion = habit.date_of_initiation + (habit.length - node_idx - 1) %>
+                                <% node_idx = habit.length - 1 %>
+                                <% habit.reverse_each do |node| %>
+                                <% @date_of_completion = habit.date_of_initiation + (habit.length - 1 - node_idx) %>
+
                                 <div class="swiper-slide"
                                   data-name="<%== "#{habit.id}-#{node_idx}-day-#{node.today}" %>"
                                   data-date="<%== "<span>#{@date_of_completion.strftime '%d'}</span>" %>">&nbsp;
@@ -112,7 +113,7 @@
                 </dl>
 
                                 </div>
-                                <% node_idx += 1 %>
+                                <% node_idx -= 1 %>
                                 <% end %>
                               </div>
                               <!-- Swiper buttons are not needed as we use them on the base swiper -->
